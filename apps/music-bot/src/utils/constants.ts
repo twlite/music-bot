@@ -16,6 +16,19 @@ export const RedisConfig = {
 
 export const CommandsPath = join(getDirname(import.meta.url), '..', 'commands');
 export const EventsPath = join(getDirname(import.meta.url), '..', 'events');
+export const PlayerEventsPath = join(
+  getDirname(import.meta.url),
+  '..',
+  'player',
+  'events'
+);
+
+export const EmbedColor = {
+  Success: 0x00fa9a,
+  Error: 0xff2a16,
+  Warning: 0xffd700,
+  Info: 0x00bfaf,
+} as const;
 
 export const DiscordPlayerOptions: DiscordPlayerConfig = {
   extractorConfig: {
