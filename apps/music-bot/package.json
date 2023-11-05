@@ -1,0 +1,30 @@
+{
+  "name": "music-bot",
+  "version": "1.0.0",
+  "description": "Discord music bot example built with discord-player.",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@discord-player/extractor": "^4.4.5",
+    "@prisma/client": "5.5.2",
+    "commandkit": "^0.1.6",
+    "discord-player": "^6.6.6",
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
+    "ioredis": "^5.3.2",
+    "mediaplex": "^0.0.8",
+    "prisma": "^5.5.2",
+    "trpc": "^0.11.3"
+  },
+  "devDependencies": {
+    "tsconfig": "workspace:*",
+    "typescript": "^5.2.2"
+  }
+}
