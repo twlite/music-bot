@@ -13,5 +13,5 @@ export const data = new SlashCommandBuilder().addStringOption((option) =>
 export async function run({ interaction, client }: SlashCommandProps) {
   const player = useMainPlayer();
 
-  // TODO: Implement the rest of the command
+  const query = interaction.options.getString('query', true);
 }

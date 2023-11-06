@@ -1,0 +1,22 @@
+import type { ValidationFunctionProps } from 'commandkit';
+import { EmbedGenerator } from '../utils/EmbedGenerator';
+
+export default async function ({ interaction }: ValidationFunctionProps) {
+  if (!interaction.inCachedGuild()) return true;
+
+  const selfChannel = interaction.guild.members.me?.voice.channel;
+  const memberChannel = interaction.member.voice.channel;
+
+  if (
+    (selfChannel && !memberChannel) ||
+    (selfChannel && memberChannel && selfChannel.id !== memberChannel.id)
+  ) {
+    const embed = EmbedGenerator.Error({
+      title: 'Error!',
+      description: `You must join ${selfChannel.toString()} to use this command.`,
+    }).createAuthor(interaction.user);
+
+    await interaction.reply({ embeds: [embed] });
+    return true;
+  }
+}
