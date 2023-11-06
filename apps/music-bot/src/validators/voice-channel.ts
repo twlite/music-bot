@@ -11,6 +11,16 @@ export default async function ({
   const selfChannel = interaction.guild.members.me?.voice.channel;
   const memberChannel = interaction.member.voice.channel;
 
+  if (!selfChannel && !memberChannel) {
+    const embed = EmbedGenerator.Error({
+      title: 'Error!',
+      description: 'You must join a voice channel to use this command.',
+    }).createAuthor(interaction.user);
+
+    await interaction.reply({ embeds: [embed] });
+    return true;
+  }
+
   if (
     (selfChannel && !memberChannel) ||
     (selfChannel && memberChannel && selfChannel.id !== memberChannel.id)
