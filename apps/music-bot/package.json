@@ -25,7 +25,8 @@
     "dotenv": "^16.3.1",
     "ioredis": "^5.3.2",
     "mediaplex": "^0.0.8",
-    "prisma": "^5.5.2"
+    "prisma": "^5.5.2",
+    "youtube-ext": "^1.1.16"
   },
   "devDependencies": {
     "rimraf": "^5.0.5",

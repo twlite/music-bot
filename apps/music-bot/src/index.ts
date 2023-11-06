@@ -8,13 +8,15 @@ import { DiscordPlayerOptions } from './utils/constants.js';
 import { registerPlayerEvents } from './player/registerEvents.js';
 
 const player = new Player(client, {
-  skipFFmpeg: false
+  skipFFmpeg: false,
 });
 
 await registerPlayerEvents();
 
 await player.extractors.loadDefault((ext) => {
-  return DiscordPlayerOptions.disableSources.includes(ext);
+  return !DiscordPlayerOptions.disableSources.includes(ext);
 }, DiscordPlayerOptions.extractorConfig);
+
+console.log(player.scanDeps());
 
 await client.login();
