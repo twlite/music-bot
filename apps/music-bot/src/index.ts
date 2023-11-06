@@ -7,7 +7,9 @@ import { Player } from 'discord-player';
 import { DiscordPlayerOptions } from './utils/constants.js';
 import { registerPlayerEvents } from './player/registerEvents.js';
 
-const player = new Player(client);
+const player = new Player(client, {
+  skipFFmpeg: false
+});
 
 await registerPlayerEvents();
 
