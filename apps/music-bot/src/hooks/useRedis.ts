@@ -1,4 +1,4 @@
-import { HooksRegistry, Symbols } from './registry';
+import { HooksRegistry, Symbols } from './registry.js';
 import type { Redis } from 'ioredis';
 
 export function useRedis() {

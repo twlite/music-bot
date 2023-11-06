@@ -1,7 +1,11 @@
 import type { ValidationFunctionProps } from 'commandkit';
-import { EmbedGenerator } from '../utils/EmbedGenerator';
+import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 
-export default async function ({ interaction }: ValidationFunctionProps) {
+export default async function ({
+  interaction,
+  commandObj,
+}: ValidationFunctionProps) {
+  if (commandObj.category !== 'music') return false;
   if (!interaction.inCachedGuild()) return true;
 
   const selfChannel = interaction.guild.members.me?.voice.channel;

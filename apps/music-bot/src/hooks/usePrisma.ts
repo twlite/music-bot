@@ -1,4 +1,4 @@
-import { HooksRegistry, Symbols } from './registry';
+import { HooksRegistry, Symbols } from './registry.js';
 import type { PrismaClient } from '@prisma/client';
 
 export function usePrisma() {

@@ -1,7 +1,7 @@
 import { GuildQueue, GuildQueueEvent, Track } from 'discord-player';
-import { EmbedGenerator } from '../../utils/EmbedGenerator';
-import { PlayerEvent } from '../common/types';
-import { PlayerMetadata } from '../PlayerMetadata';
+import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { PlayerEvent } from '../common/types.js';
+import { PlayerMetadata } from '../PlayerMetadata.js';
 
 export default class TrackStartEvent
   implements PlayerEvent<typeof GuildQueueEvent.playerStart>

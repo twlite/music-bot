@@ -1,5 +1,5 @@
 import { GuildQueueEvents } from 'discord-player';
-import { PlayerMetadata } from '../PlayerMetadata';
+import { PlayerMetadata } from '../PlayerMetadata.js';
 
 export interface PlayerEvent<
   K extends keyof GuildQueueEvents,

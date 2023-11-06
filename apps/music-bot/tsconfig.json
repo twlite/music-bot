@@ -5,9 +5,17 @@
     "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "module": "ESNext",
+    "module": "NodeNext",
     "target": "ESNext",
-    "moduleResolution": "node"
+    "moduleResolution": "NodeNext",
+    "declarationMap": false,
+    "sourceMap": false,
+    "declaration": false,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "#bot/*": ["src/*.js"]
+    }
   },
   "include": ["src"]
 }
