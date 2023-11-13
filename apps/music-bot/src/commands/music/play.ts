@@ -35,29 +35,41 @@ export async function run({ interaction }: SlashCommandProps) {
     const embed = EmbedGenerator.Error({
       title: 'No results found',
       description: `No results found for \`${query}\``,
-    }).createAuthor(interaction.user);
+    }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
   }
 
   try {
-    const { track } = await player.play(channel, result.tracks[0], {
-      nodeOptions: {
-        metadata: PlayerMetadata.create(interaction),
-        volume: 50,
-        repeatMode: QueueRepeatMode.AUTOPLAY,
-        noEmitInsert: true,
-      },
-      requestedBy: interaction.user,
-      connectionOptions: {
-        deaf: true,
-      },
-    });
+    const { track, searchResult } = await player.play(
+      channel,
+      result.tracks[0],
+      {
+        nodeOptions: {
+          metadata: PlayerMetadata.create(interaction),
+          volume: 50,
+          repeatMode: QueueRepeatMode.AUTOPLAY,
+          noEmitInsert: true,
+          leaveOnStop: false,
+          leaveOnEmpty: true,
+          leaveOnEmptyCooldown: 60000,
+          leaveOnEnd: true,
+          leaveOnEndCooldown: 60000,
+          pauseOnEmpty: true,
+          preferBridgedMetadata: true,
+        },
+        requestedBy: interaction.user,
+        connectionOptions: {
+          deaf: true,
+        },
+      }
+    );
 
     const embed = EmbedGenerator.Info({
-      title: 'Track queued!',
+      title: `${searchResult.hasPlaylist() ? 'Playlist' : 'Track'} queued!`,
+      thumbnail: { url: track.thumbnail },
       description: `[${track.title}](${track.url})`,
-    }).createAuthor(interaction.user);
+    }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
   } catch (e) {
@@ -66,7 +78,7 @@ export async function run({ interaction }: SlashCommandProps) {
     const embed = EmbedGenerator.Error({
       title: 'Something went wrong',
       description: `Something went wrong while playing \`${query}\``,
-    }).createAuthor(interaction.user);
+    }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
   }

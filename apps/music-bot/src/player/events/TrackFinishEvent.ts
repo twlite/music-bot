@@ -4,9 +4,9 @@ import { PlayerEvent } from '../common/types.js';
 import { PlayerMetadata } from '../PlayerMetadata.js';
 
 export default class TrackStartEvent
-  implements PlayerEvent<typeof GuildQueueEvent.playerStart>
+  implements PlayerEvent<typeof GuildQueueEvent.playerFinish>
 {
-  public name = GuildQueueEvent.playerStart;
+  public name = GuildQueueEvent.playerFinish;
 
   public async execute(
     queue: GuildQueue<PlayerMetadata>,
@@ -14,7 +14,7 @@ export default class TrackStartEvent
   ) {
     const embed = EmbedGenerator.Success({
       description: `[${track.title}](${track.url})`,
-      title: 'Now Playing',
+      title: 'Track Finished!',
       thumbnail: { url: track.thumbnail },
       footer: {
         text: `Requested by ${track.requestedBy?.tag}`,

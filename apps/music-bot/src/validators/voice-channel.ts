@@ -15,7 +15,7 @@ export default async function ({
     const embed = EmbedGenerator.Error({
       title: 'Error!',
       description: 'You must join a voice channel to use this command.',
-    }).createAuthor(interaction.user);
+    }).withAuthor(interaction.user);
 
     await interaction.reply({ embeds: [embed] });
     return true;
@@ -28,7 +28,7 @@ export default async function ({
     const embed = EmbedGenerator.Error({
       title: 'Error!',
       description: `You must join ${selfChannel.toString()} to use this command.`,
-    }).createAuthor(interaction.user);
+    }).withAuthor(interaction.user);
 
     await interaction.reply({ embeds: [embed] });
     return true;

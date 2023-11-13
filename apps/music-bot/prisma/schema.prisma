@@ -10,6 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Guild {
-  id String @id @unique
+model Playlist {
+  id        String   @id @unique @default(uuid())
+  name      String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  tracks    Json[]   @default([])
+  private   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String     @id @unique
+  playlists Playlist[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
