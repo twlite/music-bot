@@ -13,12 +13,17 @@ const player = new Player(client, {
   queryCache: new RedisQueryCache(redis),
 });
 
+if (process.env.NODE_ENV !== 'production') {
+  player.on('debug', (message) => console.log(`[Player] ${message}`));
+  player.events.on('debug', (queue, message) =>
+    console.log(`[${queue.guild.name}: ${queue.guild.id}] ${message}`)
+  );
+}
+
 await registerPlayerEvents();
 
 await player.extractors.loadDefault((ext) => {
   return !DiscordPlayerOptions.disableSources.includes(ext);
 }, DiscordPlayerOptions.extractorConfig);
-
-console.log(player.scanDeps());
 
 await client.login();

@@ -53,7 +53,7 @@ export async function run({ interaction }: SlashCommandProps) {
     return interaction.editReply({ embeds: [embed] });
   }
 
-  const tracks = [queue.currentTrack, queue.tracks]
+  const tracks = [queue.currentTrack, ...queue.tracks.store]
     .filter(Boolean)
     .map((track) => serialize(track));
 

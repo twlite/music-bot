@@ -33,50 +33,52 @@ export async function run({ interaction }: SlashCommandProps) {
 
   await interaction.deferReply();
 
-  const result = await db.playlist.findUnique({
-    where: {
-      id,
-    },
-  });
-
-  if (!result || (result.authorId !== interaction.user.id && result.private)) {
-    const embed = EmbedGenerator.Error({
-      title: 'No playlist found',
-      description: `No playlist found with id \`${id}\``,
-    }).withAuthor(interaction.user);
-
-    return interaction.editReply({ embeds: [embed] });
-  }
-
-  const playlist = player.createPlaylist({
-    author: {
-      name: interaction.user.username,
-      url: '',
-    },
-    description: '',
-    id: result.id,
-    source: 'arbitrary',
-    thumbnail: '',
-    title: result.name,
-    tracks: [],
-    type: 'playlist',
-    url: '',
-  });
-
-  const tracks = result.tracks.map((track) => {
-    const song = deserialize(
-      player,
-      track as SerializedTrack
-    ) as Track<unknown>;
-
-    song.playlist = playlist;
-
-    return song;
-  });
-
-  playlist.tracks = tracks;
-
   try {
+    const result = await db.playlist.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (
+      !result ||
+      (result.authorId !== interaction.user.id && result.private)
+    ) {
+      const embed = EmbedGenerator.Error({
+        title: 'No playlist found',
+        description: `No playlist found with id \`${id}\``,
+      }).withAuthor(interaction.user);
+
+      return interaction.editReply({ embeds: [embed] });
+    }
+
+    const playlist = player.createPlaylist({
+      author: {
+        name: interaction.user.username,
+        url: '',
+      },
+      description: '',
+      id: result.id,
+      source: 'arbitrary',
+      thumbnail: '',
+      title: result.name,
+      tracks: [],
+      type: 'playlist',
+      url: '',
+    });
+
+    const tracks = result.tracks.map((track) => {
+      const song = deserialize(
+        player,
+        track as SerializedTrack
+      ) as Track<unknown>;
+
+      song.playlist = playlist;
+
+      return song;
+    });
+
+    playlist.tracks = tracks;
     const { track } = await player.play(channel, playlist, {
       nodeOptions: {
         metadata: PlayerMetadata.create(interaction),
