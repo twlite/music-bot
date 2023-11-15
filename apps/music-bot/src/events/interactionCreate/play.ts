@@ -7,44 +7,46 @@ export default async function interactionCreate(interaction: Interaction) {
     return;
   const query = interaction.options.getString('query', true);
 
-  if (!query) return interaction.respond([]).catch(() => {});
+  if (!query.length) return interaction.respond([]);
 
-  // autocomplete custom playlists from cache
-  if (query.startsWith('playlist:')) {
-    const redis = useRedis();
+  try {
+    // autocomplete custom playlists from cache
+    if (query.startsWith('playlist:')) {
+      const redis = useRedis();
 
-    try {
-      const result = await redis.get(`discord-player:custom-${query}`);
-      if (result) {
-        const parsed = JSON.parse(result);
+      try {
+        const result = await redis.get(`discord-player:custom-${query}`);
+        if (result) {
+          const parsed = JSON.parse(result);
 
-        return interaction
-          .respond([
+          return interaction.respond([
             {
               name: parsed.name.slice(0, 100),
               value: parsed.url,
             },
-          ])
-          .catch(() => {});
+          ]);
+        }
+      } catch {
+        // fall back to default search
       }
-    } catch {
-      // fall back to default search
     }
+
+    const player = useMainPlayer();
+
+    const data = await player.search(query, { requestedBy: interaction.user });
+
+    if (!data.hasTracks()) return interaction.respond([]);
+
+    const results = data.tracks
+      .filter((track) => track.url.length < 100)
+      .slice(0, 10)
+      .map((track) => ({
+        name: track.title.slice(0, 100),
+        value: track.url,
+      }));
+
+    return interaction.respond(results);
+  } catch {
+    return interaction.respond([]).catch(() => {});
   }
-
-  const player = useMainPlayer();
-
-  const data = await player.search(query, { requestedBy: interaction.user });
-
-  if (!data.hasTracks()) return interaction.respond([]).catch(() => {});
-
-  const results = data.tracks
-    .filter((track) => track.url.length < 100)
-    .slice(0, 10)
-    .map((track) => ({
-      name: track.title.slice(0, 100),
-      value: track.url,
-    }));
-
-  return interaction.respond(results).catch(() => {});
 }

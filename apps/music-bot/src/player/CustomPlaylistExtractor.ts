@@ -12,7 +12,7 @@ import {
 
 export class CustomPlaylistExtractor extends BaseExtractor {
   private prisma: PrismaClient | null = null;
-  public static identifier = 'com.discord-player.custom-playlist' as const;
+  public static identifier = 'custom-playlist-extractor' as const;
 
   public async activate() {
     this.prisma = usePrisma();
@@ -43,8 +43,9 @@ export class CustomPlaylistExtractor extends BaseExtractor {
   ): Promise<ExtractorInfo> {
     if (!this.prisma) return this.createResponse();
 
-    const id = query.split('playlist:')[1];
-
+    const id = query.startsWith('playlist')
+      ? query.split('playlist:')[1]
+      : query;
     const result = await this.prisma.playlist.findUnique({
       where: {
         id,

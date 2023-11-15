@@ -5,7 +5,7 @@ import { usePrisma } from '#bot/hooks/usePrisma';
 
 type EQ = { band: number; gain: number };
 
-export default class TrackStartEvent
+export default class EqualizerUpdateEvent
   implements PlayerEvent<typeof GuildQueueEvent.equalizerUpdate>
 {
   public name = GuildQueueEvent.equalizerUpdate;

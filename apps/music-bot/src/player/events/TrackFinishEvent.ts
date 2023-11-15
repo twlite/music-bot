@@ -3,7 +3,7 @@ import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import { PlayerEvent } from '../common/types.js';
 import { PlayerMetadata } from '../PlayerMetadata.js';
 
-export default class TrackStartEvent
+export default class TrackFinishEvent
   implements PlayerEvent<typeof GuildQueueEvent.playerFinish>
 {
   public name = GuildQueueEvent.playerFinish;

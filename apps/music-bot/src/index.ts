@@ -30,3 +30,13 @@ await player.extractors.loadDefault((ext) => {
 await player.extractors.register(CustomPlaylistExtractor, {});
 
 await client.login();
+
+// prevent crash on unhandled promise rejection
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled promise rejection:', reason);
+});
+
+// prevent crash on uncaught exception
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error);
+});

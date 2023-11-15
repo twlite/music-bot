@@ -15,16 +15,7 @@ export default async function loadCustomPlaylistsCache(client: Client<true>) {
 
   if (!playlists.length) return;
 
-  const resolvedList = new Map<
-    string,
-    {
-      id: string;
-      name: string;
-      author: string;
-      url: string;
-      trackCount: number;
-    }
-  >();
+  const resolvedList = new Map<string, string>();
 
   await Promise.all(
     playlists.map(async (list) => {
@@ -33,13 +24,16 @@ export default async function loadCustomPlaylistsCache(client: Client<true>) {
         .then((u) => u.displayName)
         .catch(() => list.authorId);
 
-      resolvedList.set(`discord-player:custom-playlist:${list.id}`, {
-        id: list.id,
-        name: list.name,
-        author: user,
-        url: `playlist:${list.id}`,
-        trackCount: list.tracks.length,
-      });
+      resolvedList.set(
+        `discord-player:custom-playlist:${list.id}`,
+        JSON.stringify({
+          id: list.id,
+          name: list.name,
+          author: user,
+          url: `playlist:${list.id}`,
+          trackCount: list.tracks.length,
+        })
+      );
     })
   );
 

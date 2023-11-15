@@ -79,6 +79,9 @@ export async function run({ interaction }: SlashCommandProps) {
       title: `${searchResult.hasPlaylist() ? 'Playlist' : 'Track'} queued!`,
       thumbnail: { url: track.thumbnail },
       description: `[${track.title}](${track.url})`,
+      fields: searchResult.playlist
+        ? [{ name: 'Playlist', value: searchResult.playlist.title }]
+        : [],
     }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });

@@ -45,6 +45,12 @@ export async function run({ interaction }: SlashCommandProps) {
   if (mode != null) {
     queue.setRepeatMode(mode);
 
+    const embed = EmbedGenerator.Success({
+      title: 'Repeat mode changed',
+      description: `I have successfully changed the repeat mode to \`${QueueRepeatMode[mode]}\``,
+    }).withAuthor(interaction.user);
+
+    await interaction.editReply({ embeds: [embed] });
     await prisma.guild
       .upsert({
         where: { id: interaction.guildId },
@@ -52,13 +58,7 @@ export async function run({ interaction }: SlashCommandProps) {
         update: { loopMode: mode },
       })
       .catch(() => null);
-
-    const embed = EmbedGenerator.Success({
-      title: 'Repeat mode changed',
-      description: `I have successfully changed the repeat mode to \`${QueueRepeatMode[mode]}\``,
-    }).withAuthor(interaction.user);
-
-    return interaction.editReply({ embeds: [embed] });
+    return;
   }
 
   const embed = EmbedGenerator.Success({

@@ -11,11 +11,6 @@ import {
 } from 'discord-player';
 import type { Redis } from 'ioredis';
 
-/*
-RedisQueryCache is a class that implements the QueryCacheProvider interface of discord-player. It allows discord-player to cache search results
-using redis. Each results are stored for 5 hours.
-*/
-
 export class RedisQueryCache implements QueryCacheProvider<Track> {
   public EXPIRY_TIMEOUT = 3600 * 5;
   public constructor(public redis: Redis) {}

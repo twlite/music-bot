@@ -3,7 +3,7 @@ import { PlayerEvent } from '../common/types.js';
 import { PlayerMetadata } from '../PlayerMetadata.js';
 import { usePrisma } from '#bot/hooks/usePrisma';
 
-export default class TrackStartEvent
+export default class VolumeChangeEvent
   implements PlayerEvent<typeof GuildQueueEvent.volumeChange>
 {
   public name = GuildQueueEvent.volumeChange;
