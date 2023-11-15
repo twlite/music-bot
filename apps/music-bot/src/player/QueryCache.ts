@@ -57,6 +57,7 @@ export class RedisQueryCache implements QueryCacheProvider<Track> {
     context: QueryCacheResolverContext
   ): Promise<SearchResult> {
     const player = useMainPlayer();
+
     try {
       const key = this.createKey(context.query);
 

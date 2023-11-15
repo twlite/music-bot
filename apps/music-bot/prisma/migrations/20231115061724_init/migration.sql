@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Guild" ALTER COLUMN "equalizer" SET DATA TYPE DOUBLE PRECISION[];

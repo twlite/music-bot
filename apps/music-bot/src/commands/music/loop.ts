@@ -1,3 +1,4 @@
+import { usePrisma } from '#bot/hooks/usePrisma';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useTimeline, QueueRepeatMode, useQueue } from 'discord-player';
@@ -28,6 +29,7 @@ export async function run({ interaction }: SlashCommandProps) {
   await interaction.deferReply();
 
   const queue = useQueue(interaction.guildId);
+  const prisma = usePrisma();
 
   if (!queue?.isPlaying()) {
     const embed = EmbedGenerator.Error({
@@ -42,6 +44,14 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (mode != null) {
     queue.setRepeatMode(mode);
+
+    await prisma.guild
+      .upsert({
+        where: { id: interaction.guildId },
+        create: { id: interaction.guildId, loopMode: mode },
+        update: { loopMode: mode },
+      })
+      .catch(() => null);
 
     const embed = EmbedGenerator.Success({
       title: 'Repeat mode changed',

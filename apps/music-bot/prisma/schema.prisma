@@ -6,8 +6,19 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Guild {
+  id        String   @id @unique
+  volume    Int      @default(50)
+  equalizer Float[]  @default([])
+  filters   String[] @default([])
+  loopMode  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Playlist {
@@ -17,6 +28,7 @@ model Playlist {
   authorId  String
   tracks    Json[]   @default([])
   private   Boolean  @default(false)
+  unlisted  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

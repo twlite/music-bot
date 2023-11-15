@@ -1,3 +1,4 @@
+import loadCustomPlaylistsCache from '#bot/events/ready/loadCustomPlaylists';
 import { usePrisma } from '#bot/hooks/usePrisma';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import type { CommandData, SlashCommandProps } from 'commandkit';
@@ -76,9 +77,11 @@ export async function run({ interaction }: SlashCommandProps) {
     },
   });
 
+  await loadCustomPlaylistsCache(interaction.client).catch(() => {});
+
   const embed = EmbedGenerator.Success({
     title: 'Playlist created',
-    description: `I have successfully created the playlist \`${playlist.name}\` (ID: \`${playlist.id}\`) with ${tracks.length} tracks.`,
+    description: `I have successfully created the playlist \`${playlist.name}\` (\`playlist:${playlist.id}\`) with ${tracks.length} tracks. You can play it using \`/play\` command.`,
   }).withAuthor(interaction.user);
 
   return interaction.editReply({ embeds: [embed] });

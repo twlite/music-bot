@@ -7,6 +7,7 @@ import { Player } from 'discord-player';
 import { DiscordPlayerOptions } from './utils/constants.js';
 import { registerPlayerEvents } from './player/registerEvents.js';
 import { RedisQueryCache } from './player/QueryCache.js';
+import { CustomPlaylistExtractor } from './player/CustomPlaylistExtractor.js';
 
 const player = new Player(client, {
   skipFFmpeg: false,
@@ -25,5 +26,7 @@ await registerPlayerEvents();
 await player.extractors.loadDefault((ext) => {
   return !DiscordPlayerOptions.disableSources.includes(ext);
 }, DiscordPlayerOptions.extractorConfig);
+
+await player.extractors.register(CustomPlaylistExtractor, {});
 
 await client.login();

@@ -1,4 +1,5 @@
 import { PlayerMetadata } from '#bot/player/PlayerMetadata';
+import { fetchPlayerOptions } from '#bot/player/playerOptions';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { QueueRepeatMode, useMainPlayer } from 'discord-player';
@@ -10,7 +11,8 @@ export const data: CommandData = {
   options: [
     {
       name: 'query',
-      description: 'The track or playlist to play',
+      description:
+        'The track or playlist to play. Custom playlist id must be prefixed with "playlist:"',
       type: ApplicationCommandOptionType.String,
       autocomplete: true,
       required: true,
@@ -20,7 +22,6 @@ export const data: CommandData = {
 
 export async function run({ interaction }: SlashCommandProps) {
   if (!interaction.inCachedGuild()) return;
-
   const player = useMainPlayer();
   const channel = interaction.member.voice.channel!;
   const query = interaction.options.getString('query', true);
@@ -41,14 +42,23 @@ export async function run({ interaction }: SlashCommandProps) {
   }
 
   try {
+    const playerOptions = await fetchPlayerOptions(interaction.guildId);
+
     const { track, searchResult } = await player.play(
       channel,
       result.tracks[0],
       {
         nodeOptions: {
           metadata: PlayerMetadata.create(interaction),
-          volume: 50,
-          repeatMode: QueueRepeatMode.AUTOPLAY,
+          volume: playerOptions.volume,
+          repeatMode: QueueRepeatMode[
+            playerOptions.loopMode
+          ] as unknown as QueueRepeatMode,
+          a_filter: playerOptions.filters as ('8D' | 'Tremolo' | 'Vibrato')[],
+          equalizer: playerOptions.equalizer.map((eq, i) => ({
+            band: i,
+            gain: eq,
+          })),
           noEmitInsert: true,
           leaveOnStop: false,
           leaveOnEmpty: true,
