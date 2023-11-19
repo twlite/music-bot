@@ -13,4 +13,4 @@ A complete example of a discord music bot including database, web dashboard, and
 
 # Web Dashboard Preview
 
-[Web Interface](https://github.com/twlite/music-bot/blob/main/assets/image.png?raw=true)
+![Web Interface](https://github.com/twlite/music-bot/blob/main/assets/image.png?raw=true)
