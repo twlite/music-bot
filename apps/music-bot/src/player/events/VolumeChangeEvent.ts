@@ -1,7 +1,8 @@
 import { GuildQueue, GuildQueueEvent } from 'discord-player';
 import { PlayerEvent } from '../common/types.js';
 import { PlayerMetadata } from '../PlayerMetadata.js';
-import { usePrisma } from '#bot/hooks/usePrisma';
+import { useDatabase } from '#bot/hooks/useDatabase';
+import { io } from '#bot/web/index';
 
 export default class VolumeChangeEvent
   implements PlayerEvent<typeof GuildQueueEvent.volumeChange>
@@ -13,15 +14,16 @@ export default class VolumeChangeEvent
     _oldVolume: number,
     newVolume: number
   ) {
+    io.to(queue.guild.id).emit('volume', newVolume);
     const guildId = queue.guild.id;
-    const prisma = usePrisma();
+    const db = useDatabase();
 
-    await prisma.guild
-      .upsert({
-        where: { id: guildId },
-        create: { id: guildId, volume: newVolume },
-        update: { volume: newVolume },
-      })
+    await db.guild
+      .findOneAndUpdate(
+        { id: guildId },
+        { id: guildId, volume: newVolume },
+        { new: true, upsert: true }
+      )
       .catch(() => null);
   }
 }

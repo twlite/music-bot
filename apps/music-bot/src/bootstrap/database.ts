@@ -1,12 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import mongoose from 'mongoose';
 import { HooksRegistry, Symbols } from '#bot/hooks/registry';
+import { GuildModel } from './mongo/Guild.schema.js';
+import { PlaylistModel } from './mongo/Playlist.Schema.js';
 
-const prisma = new PrismaClient();
-
-await prisma.$connect();
+const db = await mongoose.connect(process.env.DATABASE_URL!);
 
 console.log('Connected to the database');
 
-HooksRegistry.set(Symbols.kPrisma, prisma);
+export class MongoDatabase {
+  public guild = GuildModel;
+  public playlist = PlaylistModel;
 
-export { prisma as db };
+  public constructor(public mongo: typeof db) {}
+}
+
+HooksRegistry.set(Symbols.kDatabase, new MongoDatabase(db));
+
+export { db };

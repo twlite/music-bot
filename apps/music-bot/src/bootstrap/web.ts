@@ -1,18 +1,7 @@
-import { publicProcedure, router } from '#bot/web/trpc';
-import { createHTTPServer } from '@trpc/server/adapters/standalone';
+import { app } from '#bot/web/index';
 
-const appRouter = router({
-  ping: publicProcedure.query(async () => {
-    return 'pong';
-  }),
+const PORT = Number(process.env.PORT);
+
+app.listen(PORT, () => {
+  console.log(`Web server listening on port: *${PORT}`);
 });
-
-const server = createHTTPServer({
-  router: appRouter,
-});
-
-const { port } = server.listen(Number(process.env.TRPC_PORT));
-
-console.log(`TRPC server listening on port: *${port}`);
-
-export type AppRouter = typeof appRouter;

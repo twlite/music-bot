@@ -1,7 +1,7 @@
-import { usePrisma } from '#bot/hooks/usePrisma';
+import { useDatabase } from '#bot/hooks/useDatabase';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import type { CommandData, SlashCommandProps } from 'commandkit';
-import { useTimeline, QueueRepeatMode, useQueue } from 'discord-player';
+import { QueueRepeatMode, useQueue } from 'discord-player';
 import { ApplicationCommandOptionType } from 'discord.js';
 
 export const data: CommandData = {
@@ -29,7 +29,7 @@ export async function run({ interaction }: SlashCommandProps) {
   await interaction.deferReply();
 
   const queue = useQueue(interaction.guildId);
-  const prisma = usePrisma();
+  const db = useDatabase();
 
   if (!queue?.isPlaying()) {
     const embed = EmbedGenerator.Error({
@@ -51,12 +51,18 @@ export async function run({ interaction }: SlashCommandProps) {
     }).withAuthor(interaction.user);
 
     await interaction.editReply({ embeds: [embed] });
-    await prisma.guild
-      .upsert({
-        where: { id: interaction.guildId },
-        create: { id: interaction.guildId, loopMode: mode },
-        update: { loopMode: mode },
-      })
+    await db.guild
+      .findOneAndUpdate(
+        { id: interaction.guildId },
+        {
+          id: interaction.guildId,
+          loopMode: mode,
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      )
       .catch(() => null);
     return;
   }

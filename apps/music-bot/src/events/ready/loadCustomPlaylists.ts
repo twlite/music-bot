@@ -1,16 +1,14 @@
-import { usePrisma } from '#bot/hooks/usePrisma';
+import { useDatabase } from '#bot/hooks/useDatabase';
 import { useRedis } from '#bot/hooks/useRedis';
 import { Client } from 'discord.js';
 
 export default async function loadCustomPlaylistsCache(client: Client<true>) {
-  const db = usePrisma();
+  const db = useDatabase();
   const redis = useRedis();
 
-  const playlists = await db.playlist.findMany({
-    where: {
-      private: false,
-      unlisted: false,
-    },
+  const playlists = await db.playlist.find({
+    private: false,
+    unlisted: false,
   });
 
   if (!playlists.length) return;
@@ -20,9 +18,9 @@ export default async function loadCustomPlaylistsCache(client: Client<true>) {
   await Promise.all(
     playlists.map(async (list) => {
       const user = await client.users
-        .fetch(list.authorId)
+        .fetch(list.author)
         .then((u) => u.displayName)
-        .catch(() => list.authorId);
+        .catch(() => list.author);
 
       resolvedList.set(
         `discord-player:custom-playlist:${list.id}`,

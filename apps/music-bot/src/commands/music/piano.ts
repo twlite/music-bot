@@ -4,7 +4,7 @@ import { useQueue } from 'discord-player';
 import { ApplicationCommandOptionType } from 'discord.js';
 
 export const data: CommandData = {
-  name: 'bassboost',
+  name: 'piano',
   description: 'Toggle bass boost filter',
   options: [
     {
@@ -43,21 +43,21 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (state) {
     queue.filters.equalizer.setEQ([
-      { band: 0, gain: -0.075 },
-      { band: 1, gain: 0.125 },
-      { band: 2, gain: 0.125 },
-      { band: 3, gain: 0.1 },
-      { band: 4, gain: 0.1 },
-      { band: 5, gain: 0.05 },
-      { band: 6, gain: 0.075 },
-      { band: 7, gain: 0 },
-      { band: 8, gain: 0 },
-      { band: 9, gain: 0 },
-      { band: 10, gain: 0 },
-      { band: 11, gain: 0 },
-      { band: 12, gain: 0.125 },
-      { band: 13, gain: 0.15 },
-      { band: 14, gain: 0.05 },
+      { band: 0, gain: -0.25 },
+      { band: 1, gain: -0.25 },
+      { band: 2, gain: -0.125 },
+      { band: 3, gain: 0.0 },
+      { band: 4, gain: 0.25 },
+      { band: 5, gain: 0.25 },
+      { band: 6, gain: 0.0 },
+      { band: 7, gain: -0.25 },
+      { band: 8, gain: -0.25 },
+      { band: 9, gain: 0.0 },
+      { band: 10, gain: 0.0 },
+      { band: 11, gain: 0.5 },
+      { band: 12, gain: 0.25 },
+      { band: 13, gain: -0.025 },
+      { band: 14, gain: 0.0 },
     ]);
   } else {
     queue.filters.equalizer.setEQ(queue.filters.equalizerPresets.Flat);

@@ -1,17 +1,15 @@
-import { usePrisma } from '#bot/hooks/usePrisma';
+import { useDatabase } from '#bot/hooks/useDatabase';
 
 export async function fetchPlayerOptions(guild: string) {
-  const prisma = usePrisma();
+  const mongoose = useDatabase();
 
-  const guildOptions = await prisma.guild.findUnique({
-    where: { id: guild },
+  const guildOptions = await mongoose.guild.findOne({
+    id: guild,
   });
 
   if (!guildOptions) {
-    return await prisma.guild.create({
-      data: {
-        id: guild,
-      },
+    return await mongoose.guild.create({
+      id: guild,
     });
   }
 

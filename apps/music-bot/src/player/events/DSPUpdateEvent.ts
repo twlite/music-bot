@@ -1,7 +1,7 @@
 import { GuildQueue, GuildQueueEvent } from 'discord-player';
 import { PlayerEvent } from '../common/types.js';
 import { PlayerMetadata } from '../PlayerMetadata.js';
-import { usePrisma } from '#bot/hooks/usePrisma';
+import { useDatabase } from '#bot/hooks/useDatabase';
 
 export default class DSPUpdateEvent
   implements PlayerEvent<typeof GuildQueueEvent.dspUpdate>
@@ -14,14 +14,14 @@ export default class DSPUpdateEvent
     newFilters: string[]
   ) {
     const guildId = queue.guild.id;
-    const prisma = usePrisma();
+    const db = useDatabase();
 
-    await prisma.guild
-      .upsert({
-        where: { id: guildId },
-        create: { id: guildId, filters: newFilters },
-        update: { filters: newFilters },
-      })
+    await db.guild
+      .findOneAndUpdate(
+        { id: guildId },
+        { id: guildId, filters: newFilters },
+        { upsert: true, new: true }
+      )
       .catch(() => null);
   }
 }

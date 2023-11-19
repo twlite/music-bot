@@ -1,5 +1,5 @@
 import loadCustomPlaylistsCache from '#bot/events/ready/loadCustomPlaylists';
-import { usePrisma } from '#bot/hooks/usePrisma';
+import { useDatabase } from '#bot/hooks/useDatabase';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useQueue, serialize, type SerializedTrack } from 'discord-player';
@@ -21,14 +21,21 @@ export const data: CommandData = {
       type: ApplicationCommandOptionType.Boolean,
       required: false,
     },
+    {
+      name: 'unlisted',
+      description: 'Whether or not the playlist is unlisted',
+      type: ApplicationCommandOptionType.Boolean,
+      required: false,
+    },
   ],
 };
 
 export async function run({ interaction }: SlashCommandProps) {
   if (!interaction.inCachedGuild()) return;
-  const db = usePrisma();
+  const db = useDatabase();
   const name = interaction.options.getString('name', true);
   const isPrivate = !!interaction.options.getBoolean('private', false);
+  const isUnlisted = !!interaction.options.getBoolean('unlisted', false);
 
   await interaction.deferReply({
     ephemeral: isPrivate,
@@ -58,23 +65,12 @@ export async function run({ interaction }: SlashCommandProps) {
     .filter(Boolean)
     .map((track) => serialize(track));
 
-  await db.user.upsert({
-    where: {
-      id: interaction.user.id,
-    },
-    update: {},
-    create: {
-      id: interaction.user.id,
-    },
-  });
-
   const playlist = await db.playlist.create({
-    data: {
-      name,
-      private: isPrivate,
-      authorId: interaction.user.id,
-      tracks,
-    },
+    name,
+    private: isPrivate,
+    unlisted: isUnlisted,
+    author: interaction.user.id,
+    tracks,
   });
 
   await loadCustomPlaylistsCache(interaction.client).catch(() => {});

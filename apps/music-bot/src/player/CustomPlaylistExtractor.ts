@@ -1,5 +1,4 @@
-import { usePrisma } from '#bot/hooks/usePrisma';
-import { PrismaClient } from '@prisma/client';
+import { useDatabase } from '#bot/hooks/useDatabase';
 import {
   BaseExtractor,
   ExtractorInfo,
@@ -9,18 +8,19 @@ import {
   Track,
   deserialize,
 } from 'discord-player';
+import type { MongoDatabase } from '#bot/bootstrap/database';
 
 export class CustomPlaylistExtractor extends BaseExtractor {
-  private prisma: PrismaClient | null = null;
+  private db: MongoDatabase | null = null;
   public static identifier = 'custom-playlist-extractor' as const;
 
   public async activate() {
-    this.prisma = usePrisma();
+    this.db = useDatabase();
     this.protocols = ['playlist'];
   }
 
   public async deactivate(): Promise<void> {
-    this.prisma = null;
+    this.db = null;
     this.protocols = [];
   }
 
@@ -41,28 +41,26 @@ export class CustomPlaylistExtractor extends BaseExtractor {
     query: string,
     context: ExtractorSearchContext
   ): Promise<ExtractorInfo> {
-    if (!this.prisma) return this.createResponse();
+    if (!this.db) return this.createResponse();
 
     const id = query.startsWith('playlist')
       ? query.split('playlist:')[1]
       : query;
-    const result = await this.prisma.playlist.findUnique({
-      where: {
-        id,
-      },
+    const result = await this.db.playlist.findOne({
+      id,
     });
 
     if (
       !result ||
-      (result.authorId !== context.requestedBy?.id && result.private)
+      (result.author !== context.requestedBy?.id && result.private)
     )
       return this.createResponse();
 
     const playlist = this.context.player.createPlaylist({
       author: {
         name:
-          this.context.player.client.users.resolve(result.authorId)
-            ?.displayName ?? result.authorId,
+          this.context.player.client.users.resolve(result.author)
+            ?.displayName ?? result.author,
         url: '',
       },
       description: '',
