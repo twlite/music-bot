@@ -13,4 +13,6 @@ A complete example of a discord music bot including database, web dashboard, and
 
 # Web Dashboard Preview
 
+Use the command `/web` to generate web session url.
+
 ![Web Interface](https://github.com/twlite/music-bot/blob/main/assets/image.png?raw=true)
