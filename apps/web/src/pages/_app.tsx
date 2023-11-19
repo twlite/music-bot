@@ -5,6 +5,9 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { SocketContextProvider, useSocket } from '@/context/socket.context';
 import { InvalidSession } from '@/components/auth/InvalidSession';
+import type { SocketUser } from 'music-bot/src/web/types';
+import { cn } from '@/lib/utils';
+import { ThemeProvider } from '@/components/theme';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,11 +25,18 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
       setInvalidSession(true);
     };
 
+    const onSession = (session: SocketUser) => {
+      sessionStorage.setItem('session', JSON.stringify(session));
+    };
+
     if (!socket.connected) {
-      const token = router.query.session;
+      const token = router.query.session || '1234';
       if (!token) return setInvalidSession(true);
 
       sessionStorage.setItem('token', token as string);
+
+      // @ts-expect-error
+      socket.on('ready', onSession);
 
       socket.on('connect', onConnect);
       socket.on('connect_error', onError);
@@ -38,14 +48,23 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
       socket.disconnect();
       socket.off('connect', onConnect);
       socket.off('connect_error', onError);
+      // @ts-expect-error
+      socket.off('ready', onSession);
     };
   }, [router.query.session, socket]);
 
   return (
-    <SocketContextProvider>
-      <div className={inter.className}>
-        {invalidSession ? <InvalidSession /> : <Component {...pageProps} />}
-      </div>
-    </SocketContextProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <SocketContextProvider>
+        <div className={inter.className}>
+          {invalidSession ? <InvalidSession /> : <Component {...pageProps} />}
+        </div>
+      </SocketContextProvider>
+    </ThemeProvider>
   );
 }

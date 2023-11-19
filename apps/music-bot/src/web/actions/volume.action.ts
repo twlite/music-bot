@@ -12,7 +12,7 @@ export async function VolumeAction(
   const queue = useQueue<PlayerMetadata>(info.guildId);
   if (!queue?.connection) return socket.disconnect(true);
 
-  if (!isNaN(volume) && volume > 0 && volume < 100)
+  if (!isNaN(volume) && volume >= 0 && volume <= 100)
     queue.node.setVolume(volume);
 
   await queue.metadata.channel.send({

@@ -10,3 +10,5 @@ A complete example of a discord music bot including database, web dashboard, and
   - Put mongodb database credentials in `DATABASE_URL` (You can get one for free from [Mongodb Atlas](https://www.mongodb.com/atlas))
   - Put your redis config in `REDIS_*` (you can use memurai for windows)
 - Run `pnpm run bot` to start the bot in development mode
+
+![Alt text](https://raw.githubusercontent.com/twlite/music-bot/main/assets/preview.png?raw=true 'Preview')

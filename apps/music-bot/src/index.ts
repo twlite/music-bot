@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import './bootstrap/web.js';
 import './bootstrap/database.js';
 import redis from './bootstrap/redis.js';
+import './bootstrap/web.js';
 import { client } from './bootstrap/client.js';
 import { Player } from 'discord-player';
 import { DiscordPlayerOptions } from './utils/constants.js';

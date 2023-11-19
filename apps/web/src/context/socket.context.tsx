@@ -90,7 +90,7 @@ export function useSocket() {
   const send = useCallback<
     <T extends keyof SocketActions>(
       name: T,
-      ...values: SocketActions[T][]
+      ...values: SocketActions[T]
     ) => void
   >(
     (name, ...params) => {

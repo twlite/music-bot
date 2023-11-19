@@ -12,7 +12,9 @@ export async function PauseAction(
   const queue = useQueue<PlayerMetadata>(info.guildId);
   if (!queue?.connection) return socket.disconnect(true);
 
-  const state = queue.node.setPaused(paused);
+  queue.node.setPaused(paused);
+
+  const state = queue.node.isPaused();
 
   await queue.metadata.channel.send({
     embeds: [

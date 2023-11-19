@@ -1,4 +1,4 @@
-import { useRedis } from '#bot/hooks/useRedis';
+import { useRedisAsync } from '#bot/hooks/useRedis';
 import { validateSession } from '#bot/player/session';
 import { createAdapter } from '@socket.io/redis-adapter';
 import type { Server } from 'node:http';
@@ -11,19 +11,22 @@ import { VolumeAction } from './actions/volume.action.js';
 import { PauseAction } from './actions/pause.action.js';
 import { LoopAction } from './actions/loop.action.js';
 import { PlayerMetadata } from '#bot/player/PlayerMetadata';
-import { GuildQueue, useQueue } from 'discord-player';
+import { useQueue } from 'discord-player';
 
 export type SocketUser = Awaited<ReturnType<typeof validateSession>> & {};
 
 export const socketInfo = new Collection<string, SocketUser>();
 
-export function createSocketServer(server: Server) {
-  const redis = useRedis();
+export async function createSocketServer(server: Server) {
+  const redis = await useRedisAsync();
   const subClient = redis.duplicate();
 
   const io = new SocketServer(server, {
     adapter: createAdapter(redis, subClient),
     serveClient: false,
+    cors: {
+      origin: '*',
+    },
   });
 
   io.on('connection', async (socket) => {
@@ -32,9 +35,13 @@ export function createSocketServer(server: Server) {
 
     if (!user) return socket.disconnect(true);
 
+    console.log(`[Socket ${socket.id}] ${user.username} connected.`);
+
     socketInfo.set(socket.id, user);
 
     socket.join(user.guildId);
+
+    socket.emit('ready', user);
 
     socket.on('play', (query: string) => PlayAction(user, socket, query));
     socket.on('search', (query: string) => SearchAction(user, socket, query));
@@ -46,19 +53,20 @@ export function createSocketServer(server: Server) {
 
     const handler = () => {
       const queue = useQueue<PlayerMetadata>(user.guildId);
-      if (!queue?.connection) return socket.disconnect(true);
-      socket.emit('statistics', {
-        timestamp: queue.node.getTimestamp(),
-        listeners:
-          queue.channel?.members.filter((mem) => !mem.user.bot).size ?? 0,
-        tracks: queue.tracks.size,
-        volume: queue.node.volume,
-        paused: queue.node.isPaused(),
-        repeatMode: queue.repeatMode,
-      });
+      if (queue?.connection)
+        socket.emit('statistics', {
+          timestamp: queue.node.getTimestamp(),
+          listeners:
+            queue.channel?.members.filter((mem) => !mem.user.bot).size ?? 0,
+          tracks: queue.tracks.size,
+          volume: queue.node.volume,
+          paused: queue.node.isPaused(),
+          repeatMode: queue.repeatMode,
+          track: queue.currentTrack?.serialize() ?? null,
+        });
     };
 
-    const eventLoop = setInterval(handler, 5000).unref();
+    const eventLoop = setInterval(handler, 1000).unref();
 
     handler();
 

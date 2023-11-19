@@ -6,6 +6,17 @@ import type {
 
 import { QueueRepeatMode } from 'discord-player';
 
+export type SocketUser = {
+  id: string;
+  avatar: string;
+  username: string;
+  displayName: string;
+  guildId: string;
+  guildName: string;
+  guildIcon: string | null;
+  guildAcronym: string;
+};
+
 export interface IStatistics {
   timestamp: PlayerTimestamp | null;
   listeners: number;
@@ -13,6 +24,7 @@ export interface IStatistics {
   volume: number;
   paused: boolean;
   repeatMode: QueueRepeatMode;
+  track: SerializedTrack | null;
 }
 
 export interface QueueData {
@@ -20,7 +32,7 @@ export interface QueueData {
   data: SerializedTrack[] | SerializedPlaylist;
 }
 
-export { QueueRepeatMode };
+export { QueueRepeatMode, SerializedTrack, SerializedPlaylist };
 
 export interface SocketEvents {
   statistics: [IStatistics];
@@ -33,6 +45,7 @@ export interface SocketEvents {
   playerFinish: [SerializedTrack];
   volume: [number];
   pause: [boolean];
+  ready: [SocketUser];
 }
 
 export interface SocketActions {

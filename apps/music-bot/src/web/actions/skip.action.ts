@@ -12,11 +12,17 @@ export async function SkipAction(
   const queue = useQueue<PlayerMetadata>(info.guildId);
   if (!queue?.connection) return socket.disconnect(true);
 
-  if (!back)
-    return queue.node.skip({
-      reason: TrackSkipReason.Manual,
-      description: `Track was skipped from the website by ${info.displayName} (<@${info.id}>).`,
+  if (!back) {
+    queue.node.skip();
+    return await queue.metadata.channel.send({
+      embeds: [
+        EmbedGenerator.Success({
+          title: 'Track skipped!',
+          description: `Track was skipped to next track from the website by ${info.displayName} (<@${info.id}>).`,
+        }),
+      ],
     });
+  }
 
   await queue.history.back();
 
