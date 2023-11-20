@@ -103,8 +103,12 @@ export function PlayerController({ showArt = false }) {
               href={currentTrack?.url || '#'}
               target={currentTrack ? '_blank' : undefined}
               className="font-semibold hover:underline"
+              title={currentTrack?.title}
             >
-              {currentTrack?.title ?? 'Not Playing'}
+              {currentTrack?.title
+                ?.slice(0, 27)
+                .concat(currentTrack.title.length > 27 ? '...' : '') ??
+                'Not Playing'}
             </Link>
             <span className="text-xs text-muted-foreground">
               {currentTrack?.author ?? 'N/A'}

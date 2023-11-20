@@ -8,6 +8,8 @@ import {
   deserialize,
   useMainPlayer,
   SerializedTrack,
+  SerializedPlaylist,
+  Playlist,
 } from 'discord-player';
 import type { Redis } from 'ioredis';
 
@@ -22,7 +24,9 @@ export class RedisQueryCache implements QueryCacheProvider<Track> {
   public async addData(data: SearchResult): Promise<void> {
     const key = this.createKey(data.query);
     const serialized = JSON.stringify(
-      data.tracks.map((track) => serialize(track))
+      data.playlist
+        ? serialize(data.playlist)
+        : data.tracks.map((track) => serialize(track))
     );
 
     await this.redis.setex(key, this.EXPIRY_TIMEOUT, serialized);
@@ -59,16 +63,22 @@ export class RedisQueryCache implements QueryCacheProvider<Track> {
       const serialized = await this.redis.get(key);
       if (!serialized) throw new Error('No data found');
 
-      const raw = JSON.parse(serialized) as SerializedTrack[];
+      const raw = JSON.parse(serialized) as
+        | SerializedTrack[]
+        | SerializedPlaylist;
 
-      const parsed = raw.map((item) => deserialize(player, item)) as Track[];
+      const parsed = Array.isArray(raw)
+        ? (raw.map((item) => deserialize(player, item)) as Track[])
+        : (deserialize(player, raw) as Playlist);
 
       return new SearchResult(player, {
         query: context.query,
-        extractor: parsed?.[0].extractor,
-        tracks: parsed,
+        extractor: Array.isArray(parsed)
+          ? parsed[0].extractor
+          : parsed?.tracks[0].extractor,
+        tracks: Array.isArray(parsed) ? parsed : parsed.tracks,
         requestedBy: context.requestedBy,
-        playlist: null,
+        playlist: Array.isArray(parsed) ? null : parsed,
         queryType: context.queryType,
       });
     } catch {
