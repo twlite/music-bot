@@ -44,36 +44,33 @@ export async function run({ interaction }: SlashCommandProps) {
   try {
     const playerOptions = await fetchPlayerOptions(interaction.guildId);
 
-    const { track, searchResult } = await player.play(
-      channel,
-      result.tracks[0],
-      {
-        nodeOptions: {
-          metadata: PlayerMetadata.create(interaction),
-          volume: playerOptions.volume,
-          repeatMode: QueueRepeatMode[
-            playerOptions.loopMode
-          ] as unknown as QueueRepeatMode,
-          a_filter: playerOptions.filters as ('8D' | 'Tremolo' | 'Vibrato')[],
-          equalizer: playerOptions.equalizer.map((eq, i) => ({
-            band: i,
-            gain: eq,
-          })),
-          noEmitInsert: true,
-          leaveOnStop: false,
-          leaveOnEmpty: true,
-          leaveOnEmptyCooldown: 60000,
-          leaveOnEnd: true,
-          leaveOnEndCooldown: 60000,
-          pauseOnEmpty: true,
-          preferBridgedMetadata: true,
-        },
-        requestedBy: interaction.user,
-        connectionOptions: {
-          deaf: true,
-        },
-      }
-    );
+    const { track, searchResult } = await player.play(channel, result, {
+      nodeOptions: {
+        metadata: PlayerMetadata.create(interaction),
+        volume: playerOptions.volume,
+        repeatMode: QueueRepeatMode[
+          playerOptions.loopMode
+        ] as unknown as QueueRepeatMode,
+        a_filter: playerOptions.filters as ('8D' | 'Tremolo' | 'Vibrato')[],
+        equalizer: playerOptions.equalizer.map((eq, i) => ({
+          band: i,
+          gain: eq,
+        })),
+        noEmitInsert: true,
+        leaveOnStop: false,
+        leaveOnEmpty: true,
+        leaveOnEmptyCooldown: 60000,
+        leaveOnEnd: true,
+        leaveOnEndCooldown: 60000,
+        pauseOnEmpty: true,
+        preferBridgedMetadata: true,
+        disableBiquad: true,
+      },
+      requestedBy: interaction.user,
+      connectionOptions: {
+        deaf: true,
+      },
+    });
 
     const embed = EmbedGenerator.Info({
       title: `${searchResult.hasPlaylist() ? 'Playlist' : 'Track'} queued!`,

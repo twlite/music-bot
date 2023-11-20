@@ -2,7 +2,6 @@ import { generateSession } from '#bot/player/session';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useQueue } from 'discord-player';
-import { ButtonStyle, ComponentType } from 'discord.js';
 
 export const data: CommandData = {
   name: 'web',
