@@ -43,7 +43,7 @@ export class CustomPlaylistExtractor extends BaseExtractor {
   ): Promise<ExtractorInfo> {
     if (!this.db) return this.createResponse();
 
-    const id = query.startsWith('playlist')
+    const id = query.startsWith('playlist:')
       ? query.split('playlist:')[1]
       : query;
     const result = await this.db.playlist.findOne({
