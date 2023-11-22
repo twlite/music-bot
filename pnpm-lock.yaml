@@ -38,6 +38,9 @@ importers:
       commandkit:
         specifier: ^0.1.6
         version: 0.1.6(discord.js@14.13.0)
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.5
       discord-player:
         specifier: 6.6.7-dev.0
         version: 6.6.7-dev.0(@discord-player/extractor@4.4.6-dev.0)
@@ -57,8 +60,8 @@ importers:
         specifier: ^9.0.2
         version: 9.0.2
       mediaplex:
-        specifier: ^0.0.8
-        version: 0.0.8
+        specifier: ^0.0.9
+        version: 0.0.9
       mongoose:
         specifier: ^8.0.1
         version: 8.0.1
@@ -69,6 +72,9 @@ importers:
         specifier: ^1.1.16
         version: 1.1.16
     devDependencies:
+      '@types/cors':
+        specifier: ^2.8.17
+        version: 2.8.17
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -96,6 +102,9 @@ importers:
       '@radix-ui/react-icons':
         specifier: ^1.3.0
         version: 1.3.0(react@18.2.0)
+      '@radix-ui/react-popover':
+        specifier: ^1.0.7
+        version: 1.0.7(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
       '@radix-ui/react-progress':
         specifier: ^1.0.3
         version: 1.0.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
@@ -108,6 +117,9 @@ importers:
       '@radix-ui/react-switch':
         specifier: ^1.0.3
         version: 1.0.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-toast':
+        specifier: ^1.1.5
+        version: 1.1.5(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
       '@radix-ui/react-tooltip':
         specifier: ^1.0.7
         version: 1.0.7(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
@@ -1158,6 +1170,41 @@ packages:
       react-remove-scroll: 2.5.5(@types/react@18.2.5)(react@18.2.0)
     dev: false
 
+  /@radix-ui/react-popover@1.0.7(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-shtvVnlsxT6faMnK/a7n0wptwBD23xc1Z5mdrtKLwVEfsEMXodS0r5s0/g5P0hX//EKYZS2sxUjqfzlg52ZSnQ==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@radix-ui/primitive': 1.0.1
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-context': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-dismissable-layer': 1.0.5(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-focus-guards': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-focus-scope': 1.0.4(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-id': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-popper': 1.1.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-portal': 1.0.4(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-presence': 1.0.1(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-slot': 1.0.2(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-use-controllable-state': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@types/react': 18.2.5
+      '@types/react-dom': 18.2.3
+      aria-hidden: 1.2.3
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-remove-scroll: 2.5.5(@types/react@18.2.5)(react@18.2.0)
+    dev: false
+
   /@radix-ui/react-popper@1.1.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-cKpopj/5RHZWjrbF2846jBNacjQVwkP068DfmgrNJXpvVWrOvlAmE9xSiy5OqeE+Gi8D9fP+oDhUnPqNMY8/5w==}
     peerDependencies:
@@ -1370,6 +1417,38 @@ packages:
       '@radix-ui/react-use-controllable-state': 1.0.1(@types/react@18.2.5)(react@18.2.0)
       '@radix-ui/react-use-previous': 1.0.1(@types/react@18.2.5)(react@18.2.0)
       '@radix-ui/react-use-size': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@types/react': 18.2.5
+      '@types/react-dom': 18.2.3
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /@radix-ui/react-toast@1.1.5(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-fRLn227WHIBRSzuRzGJ8W+5YALxofH23y0MlPLddaIpLpCDqdE0NZlS2NRQDRiptfxDeeCjgFIpexB1/zkxDlw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@radix-ui/primitive': 1.0.1
+      '@radix-ui/react-collection': 1.0.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-context': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-dismissable-layer': 1.0.5(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-portal': 1.0.4(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-presence': 1.0.1(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
+      '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-use-controllable-state': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-use-layout-effect': 1.0.1(@types/react@18.2.5)(react@18.2.0)
+      '@radix-ui/react-visually-hidden': 1.0.3(@types/react-dom@18.2.3)(@types/react@18.2.5)(react-dom@18.2.0)(react@18.2.0)
       '@types/react': 18.2.5
       '@types/react-dom': 18.2.3
       react: 18.2.0
@@ -1618,11 +1697,10 @@ packages:
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
     dev: false
 
-  /@types/cors@2.8.16:
-    resolution: {integrity: sha512-Trx5or1Nyg1Fq138PCuWqoApzvoSLWzZ25ORBiHMbbUT42g578lH1GT4TwYDbiUOLFuDsCkfLneT2105fsFWGg==}
+  /@types/cors@2.8.17:
+    resolution: {integrity: sha512-8CGDvrBj1zgo2qE+oS3pOCyYNqCPryMWY2bGfwA0dcfopWGgxs+78df0Rs3rc9THP4JkOhLsAa+15VdpAqkcUA==}
     dependencies:
       '@types/node': 20.5.2
-    dev: false
 
   /@types/express-serve-static-core@4.17.41:
     resolution: {integrity: sha512-OaJ7XLaelTgrvlZD8/aa0vvvxZdUmlCn6MtWeB7TkiKW70BQLc9XEPpDLPdbo52ZhXUCrznlWdCHWxJWtdyajA==}
@@ -2944,7 +3022,7 @@ packages:
     engines: {node: '>=10.2.0'}
     dependencies:
       '@types/cookie': 0.4.1
-      '@types/cors': 2.8.16
+      '@types/cors': 2.8.17
       '@types/node': 20.5.2
       accepts: 1.3.8
       base64id: 2.0.0
@@ -4791,6 +4869,7 @@ packages:
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
+    hasBin: true
     dependencies:
       js-tokens: 4.0.0
 
@@ -4819,8 +4898,8 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /mediaplex-android-arm64@0.0.8:
-    resolution: {integrity: sha512-67azKxuexHj7dSWqqAHwzZFk1FHwPWzslLgvCfCER+0szPbZ0Nme6k3jgEC6rIjoZyhP8aNmpWBKj8M2KG0kBA==}
+  /mediaplex-android-arm64@0.0.9:
+    resolution: {integrity: sha512-XAQlZwMcMO2Rk91CL4dK9OgsXa97Ahchd4bu3/DkzTxOXZQUmMZX4yEAN4FjjQctxMefBY9oh5ZdewBAffk+Fg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [android]
@@ -4828,8 +4907,8 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-darwin-arm64@0.0.8:
-    resolution: {integrity: sha512-FhajN2Sb93BtPzghGtrglIme7yHIif8Exen/TvpRAqc8ps770oOu0Bo7Hcm/sRgZh3HSUZg2KbPhQlrhposq2Q==}
+  /mediaplex-darwin-arm64@0.0.9:
+    resolution: {integrity: sha512-Q79D2jxlJ8vtdj5rlV2HgzSqINSMxZC+wpcHkGHZ/lEATh0fC5OlKdjk3wZRgfEEnY851TBuVvZoRJgJYEnKag==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
@@ -4837,16 +4916,16 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-darwin-universal@0.0.8:
-    resolution: {integrity: sha512-Q3OOYXM0FrwfiRXouI+kcn+TySYayMQabGSSe5Nz4cqYTlnJ1erarPSq6P+1fKjxZLaYkacgnILcZSKzAn1kAg==}
+  /mediaplex-darwin-universal@0.0.9:
+    resolution: {integrity: sha512-hyptA3BKr8SgDbdop8kTS9xQ4rwnYiiwqG3cHCdHj2qaWRjMus6JF6ep27A9GTDs4rFSsSXKivZZ2IlOHEW9OA==}
     engines: {node: '>= 10'}
     os: [darwin]
     requiresBuild: true
     dev: false
     optional: true
 
-  /mediaplex-darwin-x64@0.0.8:
-    resolution: {integrity: sha512-Xj7x7z2widAchu2c1TMH/SF6PtX1zG3yKdQebZg5aOuacbIJUlRgLCBYn6tc66TyPJp88hMWbLEl5992VU1RKQ==}
+  /mediaplex-darwin-x64@0.0.9:
+    resolution: {integrity: sha512-gSznB2pTt0QikrqwvNUYcFfUVkVkZiNijw5aaIZDTZfWvyFQk3HtenSQ82zwk4UKt7IfrChgh/7RLmQqOnym2g==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
@@ -4854,8 +4933,8 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-freebsd-x64@0.0.8:
-    resolution: {integrity: sha512-HwwcA1D2GHYKpGKZdrWCH/rsTqqfwT0EmBy6qZF2EG5tY1ncxU4qFlgBgpHLPJt/XopKWa1fpGnaO2zSdN5aHQ==}
+  /mediaplex-freebsd-x64@0.0.9:
+    resolution: {integrity: sha512-fcCEMLTkyPNb8dYwv+3xKIGBgLKvyw/DX4KDAw0gWy378j8aB+D7HjVupI/XWZODrzkSvIiYabCx0oy4Nyz8dg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [freebsd]
@@ -4863,8 +4942,8 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-linux-arm-gnueabihf@0.0.8:
-    resolution: {integrity: sha512-HfSzKrx6ZEDnSk42+ypZ6Bp/8OYSp6av6xenh5hyBhSu/2Czy8yZQDwGe2zSxibK44QXtpJKlrZB8HszFv2OPg==}
+  /mediaplex-linux-arm-gnueabihf@0.0.9:
+    resolution: {integrity: sha512-ZmXcv81pxgM11/R4d5WVu0ss2Pgi2eTKR/uW9cz5wUHI5uAVsI1Wf8Gufv/h24JsvLDv2e31BUmls742WzvHIQ==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
@@ -4872,8 +4951,8 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-linux-x64-gnu@0.0.8:
-    resolution: {integrity: sha512-5Myyy9zlQLPl1daWXKn7zLP2iMDqBqHPOtezhmt/4C/hKvsPkll4YxrpDE3Dn5gGBAA7WYfB03ALgdltt7JVKQ==}
+  /mediaplex-linux-x64-gnu@0.0.9:
+    resolution: {integrity: sha512-Qfzb5BcxX1N1J5ukns5DTruze/ivJJIbK0OuKCBLMoufctPMPlZKKUUJNrro088Lp0AtDXzbQoV4cVAK5nm4UQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -4881,8 +4960,8 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-win32-arm64-msvc@0.0.8:
-    resolution: {integrity: sha512-eHgIdDMDX2BZMY0vfwqXf2+C5v80jKoKMthzQqQIVgob27/jJUN4K9X/kMDWJ38dUEIlLMK9k83OzKtyRyshjA==}
+  /mediaplex-win32-arm64-msvc@0.0.9:
+    resolution: {integrity: sha512-c3FDtvg2DAoe0EWSh0vIhPwfpHLgEmW8uGajtyON5W5/ygAslAuK9Q9CemHfLfUbeko2r0RlGm2gpygn1PAzLQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
@@ -4890,8 +4969,8 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-win32-ia32-msvc@0.0.8:
-    resolution: {integrity: sha512-DWNWOJ1fQib5UpE6Yj2Otg9kAR0W7xLnHN/937uHQMNciu3SEQO5GD9Dknp6iH/v4EEMOlVU6JNiihby45IODg==}
+  /mediaplex-win32-ia32-msvc@0.0.9:
+    resolution: {integrity: sha512-ScmLR3wB6norxTXrD4JRYs9EhnbhimjXieDfmgy9DJIagxDiWQ3oxfoj8aUg1bdiS62MIiW78jQxtGUb7z8xkw==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
@@ -4899,8 +4978,8 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex-win32-x64-msvc@0.0.8:
-    resolution: {integrity: sha512-3Tn3fx8/rAlP8ml1VcMs7oC9chYDtnG1o8bBQD1hipirjsNcCY5qQwCs989XrNirtlgiKg82CiA3OUakrtDuMw==}
+  /mediaplex-win32-x64-msvc@0.0.9:
+    resolution: {integrity: sha512-0H6d4AdciOam1k2iBROjePNE5FA1QkQZ2PqmODAO4ElVEBylgWzGheyAKEyZcmdjNrHORJLl2+XpIssAvsKxag==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -4908,20 +4987,20 @@ packages:
     dev: false
     optional: true
 
-  /mediaplex@0.0.8:
-    resolution: {integrity: sha512-d/V0HdrJWdtCr2btsh+yzDn+YJ5pioyfM9UKyLLwPVCnPb7/6rrihXWB/iiM+viOuwwh9nhK3fAydRxSoYgJxw==}
+  /mediaplex@0.0.9:
+    resolution: {integrity: sha512-D907iMYWey2RA5T0EtE82RgY3ufFYZ95/5jjty01SOSUOK8lIudjMpkaMwEewk1/tU1XpthR2/ca0U4MTGSIUw==}
     engines: {node: '>= 10'}
     optionalDependencies:
-      mediaplex-android-arm64: 0.0.8
-      mediaplex-darwin-arm64: 0.0.8
-      mediaplex-darwin-universal: 0.0.8
-      mediaplex-darwin-x64: 0.0.8
-      mediaplex-freebsd-x64: 0.0.8
-      mediaplex-linux-arm-gnueabihf: 0.0.8
-      mediaplex-linux-x64-gnu: 0.0.8
-      mediaplex-win32-arm64-msvc: 0.0.8
-      mediaplex-win32-ia32-msvc: 0.0.8
-      mediaplex-win32-x64-msvc: 0.0.8
+      mediaplex-android-arm64: 0.0.9
+      mediaplex-darwin-arm64: 0.0.9
+      mediaplex-darwin-universal: 0.0.9
+      mediaplex-darwin-x64: 0.0.9
+      mediaplex-freebsd-x64: 0.0.9
+      mediaplex-linux-arm-gnueabihf: 0.0.9
+      mediaplex-linux-x64-gnu: 0.0.9
+      mediaplex-win32-arm64-msvc: 0.0.9
+      mediaplex-win32-ia32-msvc: 0.0.9
+      mediaplex-win32-x64-msvc: 0.0.9
     dev: false
 
   /memory-pager@1.5.0:

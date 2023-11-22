@@ -8,6 +8,7 @@ import { InvalidSession } from '@/components/auth/InvalidSession';
 import type { SocketUser } from 'music-bot/src/web/types';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -62,7 +63,13 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
     >
       <SocketContextProvider>
         <div className={inter.className}>
-          {invalidSession ? <InvalidSession /> : <Component {...pageProps} />}
+          {invalidSession ? (
+            <InvalidSession />
+          ) : (
+            <TooltipProvider>
+              <Component {...pageProps} />
+            </TooltipProvider>
+          )}
         </div>
       </SocketContextProvider>
     </ThemeProvider>

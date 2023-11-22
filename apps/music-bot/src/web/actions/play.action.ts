@@ -1,19 +1,59 @@
-import { useQueue } from 'discord-player';
+import { QueueRepeatMode, useMainPlayer, useQueue } from 'discord-player';
 import { SocketUser } from '../socket.js';
 import type { Socket } from 'socket.io';
 import { PlayerMetadata } from '#bot/player/PlayerMetadata';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { fetchPlayerOptions } from '#bot/player/playerOptions';
 
 export async function PlayAction(
   info: SocketUser,
   socket: Socket,
   query: string
 ) {
-  const queue = useQueue<PlayerMetadata>(info.guildId);
-  if (!queue?.connection) return socket.disconnect(true);
+  const player = useMainPlayer();
+  const guild = player.client.guilds.cache.get(info.guildId);
+
+  if (!guild) return socket.disconnect(true);
+
+  let queue = useQueue<PlayerMetadata>(info.guildId);
+
+  if (!queue) {
+    const channel = guild.members.cache.get(info.id)?.voice.channel;
+    if (!channel) return socket.disconnect(true);
+
+    try {
+      const playerOptions = await fetchPlayerOptions(guild.id);
+
+      queue = player.nodes.create(guild, {
+        metadata: new PlayerMetadata({ channel }),
+        volume: playerOptions.volume,
+        repeatMode: QueueRepeatMode[
+          playerOptions.loopMode
+        ] as unknown as QueueRepeatMode,
+        a_filter: playerOptions.filters as ('8D' | 'Tremolo' | 'Vibrato')[],
+        equalizer: playerOptions.equalizer.map((eq, i) => ({
+          band: i,
+          gain: eq,
+        })),
+        noEmitInsert: true,
+        leaveOnStop: false,
+        leaveOnEmpty: true,
+        leaveOnEmptyCooldown: 60000,
+        leaveOnEnd: true,
+        leaveOnEndCooldown: 60000,
+        pauseOnEmpty: true,
+        preferBridgedMetadata: true,
+        disableBiquad: true,
+      });
+
+      await queue.connect(channel);
+    } catch {
+      socket.emit('error', 'Failed to join your voice channel.');
+      return socket.disconnect(true);
+    }
+  }
 
   try {
-    const hasTrack = queue.currentTrack;
     const result = await queue.play(query, {
       requestedBy: info.id,
     });
@@ -34,11 +74,11 @@ export async function PlayAction(
       ],
     });
 
-    return socket.emit(hasTrack ? 'queued' : 'play', {
+    return socket.emit('queued', {
       playlist: result.searchResult.hasPlaylist(),
       data: (result.searchResult.playlist || result.track).serialize(),
     });
   } catch {
-    return socket.emit('error', 'No results found');
+    return socket.emit('error', 'Failed to play that track.');
   }
 }

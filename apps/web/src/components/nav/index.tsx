@@ -1,7 +1,6 @@
 import { useSession } from '@/hooks/useSession';
 import { Avatar, AvatarImage } from '../ui/avatar';
 import { AvatarFallback } from '@radix-ui/react-avatar';
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,8 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '../ui/input';
 import { ThemeToggle } from '../theme/toggle-theme';
+import { SearchBox } from './search-box';
 
 export function Navbar() {
   const [session, setSession] = useSession();
@@ -26,10 +25,7 @@ export function Navbar() {
         </Avatar>
         <span className="font-semibold">{session.guildName}</span>
       </div>
-      <div className="relative flex items-center w-1/3">
-        <MagnifyingGlassIcon className="absolute left-3" />
-        <Input className="pl-8" placeholder="Search a track" />
-      </div>
+      <SearchBox />
       <div className="inline-flex gap-2">
         <ThemeToggle />
         <ProfileDropdown session={session} setSession={setSession} />

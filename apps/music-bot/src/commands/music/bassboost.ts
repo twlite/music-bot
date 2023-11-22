@@ -44,8 +44,8 @@ export async function run({ interaction }: SlashCommandProps) {
   if (state) {
     queue.filters.equalizer.setEQ([
       { band: 0, gain: -0.075 },
-      { band: 1, gain: 0.125 },
-      { band: 2, gain: 0.125 },
+      { band: 1, gain: -0.125 },
+      { band: 2, gain: -0.125 },
       { band: 3, gain: 0.1 },
       { band: 4, gain: 0.1 },
       { band: 5, gain: 0.05 },
