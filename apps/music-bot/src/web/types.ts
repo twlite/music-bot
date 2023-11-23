@@ -5,6 +5,7 @@ import type {
 } from 'discord-player';
 
 import { QueueRepeatMode } from 'discord-player';
+import { EqualizerBand } from './actions/equalizer.action.js';
 
 export type SocketUser = {
   id: string;
@@ -25,6 +26,8 @@ export interface IStatistics {
   paused: boolean;
   repeatMode: QueueRepeatMode;
   track: SerializedTrack | null;
+  equalizer: EqualizerBand[];
+  shuffle: boolean;
 }
 
 export interface QueueData {
@@ -40,12 +43,13 @@ export interface SocketEvents {
   queued: [QueueData];
   play: [QueueData];
   error: [string];
-  equalizer: [number[]];
+  equalizer: [EqualizerBand[]];
   playerStart: [SerializedTrack];
   playerFinish: [SerializedTrack];
   volume: [number];
   pause: [boolean];
   ready: [SocketUser];
+  shuffle: [boolean];
 }
 
 export interface SocketActions {
@@ -56,4 +60,6 @@ export interface SocketActions {
   volume: [number];
   pause: [boolean];
   loop: [QueueRepeatMode];
+  equalizer: [EqualizerBand[]];
+  shuffle: [boolean];
 }

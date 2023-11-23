@@ -3,8 +3,7 @@ import { PlayerEvent } from '../common/types.js';
 import { PlayerMetadata } from '../PlayerMetadata.js';
 import { useDatabase } from '#bot/hooks/useDatabase';
 import { io } from '#bot/web/index';
-
-type EQ = { band: number; gain: number };
+import type { EqualizerBand } from '#bot/web/actions/equalizer.action';
 
 export default class EqualizerUpdateEvent
   implements PlayerEvent<typeof GuildQueueEvent.equalizerUpdate>
@@ -13,8 +12,8 @@ export default class EqualizerUpdateEvent
 
   public async execute(
     queue: GuildQueue<PlayerMetadata>,
-    _oldEQ: EQ[],
-    newEQ: EQ[]
+    _oldEQ: EqualizerBand[],
+    newEQ: EqualizerBand[]
   ) {
     io.to(queue.guild.id).emit('equalizer', newEQ);
     const guildId = queue.guild.id;

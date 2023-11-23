@@ -3,18 +3,31 @@ import { ActionIcon } from './action-icon';
 import {
   PauseIcon,
   PlayIcon,
+  ShuffleIcon,
   TrackNextIcon,
   TrackPreviousIcon,
 } from '@radix-ui/react-icons';
 import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
-export function TimelineActions({ paused }: { paused: boolean }) {
+export function TimelineActions({
+  paused,
+  shuffle,
+}: {
+  paused: boolean;
+  shuffle: boolean;
+}) {
   const { send } = useSocket();
   const [localPaused, setLocalPaused] = useState(paused);
+  const [shuffleMode, setShuffleMode] = useState(shuffle);
 
   useEffect(() => {
     setLocalPaused(paused);
   }, [paused]);
+
+  useEffect(() => {
+    setShuffleMode(shuffle);
+  }, [shuffle]);
 
   return (
     <div className="flex gap-4">
@@ -54,6 +67,21 @@ export function TimelineActions({ paused }: { paused: boolean }) {
         name="Next track"
       >
         <TrackNextIcon className="h-5 w-5 cursor-pointer" />
+      </ActionIcon>
+      <ActionIcon
+        name={`${shuffleMode ? 'Disable' : 'Enable'} shuffle`}
+        onClick={() => {
+          const newMode = !shuffleMode;
+          setShuffleMode(newMode);
+          send('shuffle', newMode);
+        }}
+      >
+        <ShuffleIcon
+          className={cn(
+            'h-5 w-5 cursor-pointer',
+            shuffle ? 'text-destructive' : ''
+          )}
+        />
       </ActionIcon>
     </div>
   );

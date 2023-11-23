@@ -1,26 +1,23 @@
 import { useSocket, useSocketEvent } from '@/context/socket.context';
 import type { SerializedTrack } from 'music-bot/src/web/types';
 import { useCallback, useState } from 'react';
-import {
-  TrackPreviousIcon,
-  TrackNextIcon,
-  PauseIcon,
-  PlayIcon,
-} from '@radix-ui/react-icons';
-import { Progress } from '../ui/progress';
 import Link from 'next/link';
 import { AlbumCover } from './album-cover';
-import { ActionIcon } from './action-icon';
 import { VolumeController } from './volume-controller';
 import { TimelineActions } from './timeline-actions';
 import { TrackProgress } from './track-progress';
 import { useToast } from '../ui/use-toast';
+import { ActionIcon } from './action-icon';
+import { EqualizerIcon } from './equalizer-icon';
+import { Equalizer } from './equalizer';
+import { cn } from '@/lib/utils';
 
 export function PlayerController({ showArt = false }) {
   const { send } = useSocket();
   const [currentTrack, setCurrentTrack] = useState<SerializedTrack | null>(
     null
   );
+  const [showEqualizer, setShowEqualizer] = useState(false);
   const [paused, setPaused] = useState(false);
   const [volume, setVolume] = useState(50);
   const [progress, setProgress] = useState(0);
@@ -28,6 +25,7 @@ export function PlayerController({ showArt = false }) {
     current: '0:00',
     total: '0:00',
   });
+  const [shuffle, setShuffle] = useState(false);
   const { toast } = useToast();
   const onvolumechange = useCallback(
     (volume: number) => {
@@ -58,6 +56,7 @@ export function PlayerController({ showArt = false }) {
       total: data.timestamp?.total.label ?? '0:00',
     });
     setCurrentTrack(data.track);
+    setShuffle(data.shuffle);
   });
 
   useSocketEvent('playerFinish', () => {
@@ -88,7 +87,9 @@ export function PlayerController({ showArt = false }) {
 
   return (
     <>
-      {showArt && currentTrack ? (
+      {showEqualizer ? (
+        <Equalizer onClose={() => setShowEqualizer(false)} />
+      ) : showArt && currentTrack ? (
         <div className="grid place-items-center h-[80vh]">
           <div className="text-center flex items-center flex-col">
             <AlbumCover
@@ -128,10 +129,21 @@ export function PlayerController({ showArt = false }) {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center w-[60%]">
-          <TimelineActions paused={paused} />
+          <TimelineActions paused={paused} shuffle={shuffle} />
           <TrackProgress duration={duration} progress={progress} />
         </div>
-        <div className="flex items-center gap-2 w-[8%]">
+        <div className="flex items-center gap-3 w-[8%]">
+          <ActionIcon
+            name="Equalizer"
+            onClick={() => setShowEqualizer((p) => !p)}
+          >
+            <EqualizerIcon
+              className={cn(
+                'h-4 w-4 cursor-pointer',
+                showEqualizer ? 'text-destructive' : ''
+              )}
+            />
+          </ActionIcon>
           <VolumeController volume={volume} onChange={onvolumechange} />
         </div>
       </div>

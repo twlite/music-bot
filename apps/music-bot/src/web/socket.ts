@@ -12,6 +12,11 @@ import { PauseAction } from './actions/pause.action.js';
 import { LoopAction } from './actions/loop.action.js';
 import { PlayerMetadata } from '#bot/player/PlayerMetadata';
 import { useQueue } from 'discord-player';
+import {
+  EqualizerAction,
+  type EqualizerBand,
+} from './actions/equalizer.action.js';
+import { ShuffleAction } from './actions/shuffle.action.js';
 
 export type SocketUser = Awaited<ReturnType<typeof validateSession>> & {};
 
@@ -50,6 +55,12 @@ export async function createSocketServer(server: Server) {
     socket.on('volume', (volume: number) => VolumeAction(user, socket, volume));
     socket.on('pause', (paused: boolean) => PauseAction(user, socket, paused));
     socket.on('loop', (mode: 0 | 1 | 2 | 3) => LoopAction(user, socket, mode));
+    socket.on('equalizer', (eq: EqualizerBand[]) =>
+      EqualizerAction(user, socket, eq)
+    );
+    socket.on('shuffle', (shuffle: boolean) =>
+      ShuffleAction(user, socket, shuffle)
+    );
 
     const handler = () => {
       const queue = useQueue<PlayerMetadata>(user.guildId);
@@ -63,6 +74,8 @@ export async function createSocketServer(server: Server) {
           paused: queue.node.isPaused(),
           repeatMode: queue.repeatMode,
           track: queue.currentTrack?.serialize() ?? null,
+          equalizer: queue.filters._lastFiltersCache.equalizer ?? [],
+          shuffle: queue.isShuffling,
         });
     };
 

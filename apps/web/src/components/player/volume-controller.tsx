@@ -6,7 +6,6 @@ import {
 } from '@radix-ui/react-icons';
 import { useEffect, useState } from 'react';
 import { Slider } from '../ui/slider';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 export function VolumeController({
   volume,
@@ -19,13 +18,13 @@ export function VolumeController({
 
   const icon =
     currentValue === 0 ? (
-      <SpeakerOffIcon className="h-5 w-5" />
+      <SpeakerOffIcon className="h-6 w-6" />
     ) : currentValue > 0 && currentValue <= 10 ? (
-      <SpeakerQuietIcon className="h-5 w-5" />
+      <SpeakerQuietIcon className="h-6 w-6" />
     ) : currentValue > 10 && currentValue < 50 ? (
-      <SpeakerModerateIcon className="h-5 w-5" />
+      <SpeakerModerateIcon className="h-6 w-6" />
     ) : currentValue >= 50 ? (
-      <SpeakerLoudIcon className="h-5 w-5" />
+      <SpeakerLoudIcon className="h-6 w-6" />
     ) : null;
 
   useEffect(() => {
@@ -33,7 +32,7 @@ export function VolumeController({
   }, [volume]);
 
   return (
-    <>
+    <div className="flex items-center gap-1 w-full">
       {icon}
       <Slider
         onValueChange={(e) => {
@@ -49,6 +48,6 @@ export function VolumeController({
         min={0}
         step={1}
       />
-    </>
+    </div>
   );
 }
