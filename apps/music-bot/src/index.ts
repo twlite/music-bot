@@ -12,6 +12,14 @@ import { CustomPlaylistExtractor } from './player/CustomPlaylistExtractor.js';
 const player = new Player(client, {
   skipFFmpeg: false,
   queryCache: new RedisQueryCache(redis),
+  ytdlOptions: {
+    requestOptions: {
+      headers: {
+        // this is optional, you can also ignore this part if you are not using youtube source
+        cookie: process.env.YOUTUBE_COOKIE,
+      },
+    },
+  },
 });
 
 if (process.env.NODE_ENV !== 'production') {
