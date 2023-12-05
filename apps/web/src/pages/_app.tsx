@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react';
 import { SocketContextProvider, useSocket } from '@/context/socket.context';
 import { InvalidSession } from '@/components/auth/InvalidSession';
 import type { SocketUser } from 'music-bot/src/web/types';
-import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Analytics } from '@vercel/analytics/react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -72,6 +72,7 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
           )}
         </div>
       </SocketContextProvider>
+      <Analytics />
     </ThemeProvider>
   );
 }
