@@ -1,3 +1,9 @@
+> # Project overview
+
+> As a core contributor to [discord-player](https://discord-player.js.org), I've dedicated significant time and effort to this project. My familiarity with the core principles of discord-player has allowed me to incorporate many of its concepts and best practices into this project, serving as a valuable reference for library users. I've strived to ensure the project is user-friendly and intuitive. Your suggestions and feedback are always welcome - feel free to open an issue or submit a pull request.
+
+---
+
 # Music Bot
 
 A complete example of a discord music bot including database, web dashboard, and more powered by [discord.js](https://discord.js.org/#/) and [discord-player](https://discord-player.js.org).
@@ -42,10 +48,6 @@ and more...
 You can now use `/web` command to get magic link to the website. You are able to add songs to the queue, skip songs, change volume and more from the website itself. You can also do this from Discord using slash commands.
 
 ![Web Interface](https://github.com/twlite/music-bot/blob/main/assets/image.png?raw=true)
-
-# Project overview
-
-As a core contributor to [discord-player](https://discord-player.js.org), I've dedicated significant time and effort to this project. My familiarity with the core principles of discord-player has allowed me to incorporate many of its concepts and best practices into this project, serving as a valuable reference for library users. I've strived to ensure the project is user-friendly and intuitive. Your suggestions and feedback are always welcome - feel free to open an issue or submit a pull request.
 
 ## Support me on Patreon
 
