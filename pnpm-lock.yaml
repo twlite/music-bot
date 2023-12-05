@@ -65,6 +65,9 @@ importers:
       mongoose:
         specifier: ^8.0.1
         version: 8.0.1
+      ms:
+        specifier: ^2.1.3
+        version: 2.1.3
       socket.io:
         specifier: ^4.7.2
         version: 4.7.2
@@ -81,6 +84,9 @@ importers:
       '@types/jsonwebtoken':
         specifier: ^9.0.5
         version: 9.0.5
+      '@types/ms':
+        specifier: ^0.7.34
+        version: 0.7.34
       rimraf:
         specifier: ^5.0.5
         version: 5.0.5
@@ -1849,6 +1855,10 @@ packages:
 
   /@types/mime@3.0.4:
     resolution: {integrity: sha512-iJt33IQnVRkqeqC7PzBHPTC6fDlRNRW8vjrgqtScAhrmMwe8c4Eo7+fUGTa+XdWrpEgpyKWMYmi2dIwMAYRzPw==}
+    dev: true
+
+  /@types/ms@0.7.34:
+    resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==}
     dev: true
 
   /@types/node@20.5.2:

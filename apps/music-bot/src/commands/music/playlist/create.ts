@@ -1,37 +1,10 @@
 import loadCustomPlaylistsCache from '#bot/events/ready/loadCustomPlaylists';
 import { useDatabase } from '#bot/hooks/useDatabase';
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
-import type { CommandData, SlashCommandProps } from 'commandkit';
-import { useQueue, serialize, type SerializedTrack } from 'discord-player';
-import { ApplicationCommandOptionType } from 'discord.js';
+import type { SlashCommandProps } from 'commandkit';
+import { serialize, useQueue } from 'discord-player';
 
-export const data: CommandData = {
-  name: 'export',
-  description: 'Export current queue to a playlist',
-  options: [
-    {
-      name: 'name',
-      description: 'The name of the playlist',
-      type: ApplicationCommandOptionType.String,
-      required: true,
-    },
-    {
-      name: 'private',
-      description: 'Whether or not the playlist is private',
-      type: ApplicationCommandOptionType.Boolean,
-      required: false,
-    },
-    {
-      name: 'unlisted',
-      description: 'Whether or not the playlist is unlisted',
-      type: ApplicationCommandOptionType.Boolean,
-      required: false,
-    },
-  ],
-};
-
-export async function run({ interaction }: SlashCommandProps) {
-  if (!interaction.inCachedGuild()) return;
+export async function handleCreatePlaylist({ interaction }: SlashCommandProps) {
   const db = useDatabase();
   const name = interaction.options.getString('name', true);
   const isPrivate = !!interaction.options.getBoolean('private', false);
@@ -41,7 +14,7 @@ export async function run({ interaction }: SlashCommandProps) {
     ephemeral: isPrivate,
   });
 
-  const queue = useQueue(interaction.guildId);
+  const queue = useQueue(interaction.guildId!);
 
   if (!queue) {
     const embed = EmbedGenerator.Error({
@@ -56,6 +29,19 @@ export async function run({ interaction }: SlashCommandProps) {
     const embed = EmbedGenerator.Error({
       title: 'Error',
       description: 'You cannot export an empty queue',
+    }).withAuthor(interaction.user);
+
+    return interaction.editReply({ embeds: [embed] });
+  }
+
+  const playlistsCount = await db.playlist.countDocuments({
+    author: interaction.user.id,
+  });
+
+  if (playlistsCount >= 50) {
+    const embed = EmbedGenerator.Error({
+      title: 'Error',
+      description: 'You cannot create more than 50 playlists.',
     }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });

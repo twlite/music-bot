@@ -1,3 +1,4 @@
+// TODO: Refactor this file
 import { useRedisAsync } from '#bot/hooks/useRedis';
 import { validateSession } from '#bot/player/session';
 import { createAdapter } from '@socket.io/redis-adapter';
