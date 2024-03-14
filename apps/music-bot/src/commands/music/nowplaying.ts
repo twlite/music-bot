@@ -18,8 +18,8 @@ export async function run({ interaction }: SlashCommandProps) {
   // this will also verify if usePlayer's value is null
   if (!timeline?.track) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'Sin reproducir',
+      description: 'No estoy reproduciendo nada ahora mismo',
     }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
@@ -28,12 +28,12 @@ export async function run({ interaction }: SlashCommandProps) {
   const { track, timestamp } = timeline;
 
   const embed = EmbedGenerator.Info({
-    title: 'Now Playing',
+    title: 'Reproduciendo',
     description: `[${track.title}](${track.url})`,
-    fields: [{ name: 'Progress', value: node.createProgressBar()! }],
+    fields: [{ name: 'Progreso', value: node.createProgressBar()! }],
     thumbnail: { url: track.thumbnail },
     footer: {
-      text: `Requested by ${track.requestedBy?.tag} • ${timestamp.progress}%`,
+      text: `Pedida por ${track.requestedBy?.tag} • ${timestamp.progress}%`,
       iconURL: track.requestedBy?.displayAvatarURL(),
     },
   }).withAuthor(interaction.user);
