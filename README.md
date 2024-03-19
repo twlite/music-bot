@@ -47,6 +47,11 @@ and more...
 
 You can now use `/web` command to get magic link to the website. You are able to add songs to the queue, skip songs, change volume and more from the website itself. You can also do this from Discord using slash commands.
 
+
+### Regards
+
+This proyect was based from [forked one](https://github.com/twlite/music-bot/) all licenses and copyrights are granted
+
 ![Web Interface](https://github.com/twlite/music-bot/blob/main/assets/image.png?raw=true)
 
 ## Support me on Patreon
