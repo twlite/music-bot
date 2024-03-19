@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useQueue } from 'discord-player';
 import { ApplicationCommandOptionType } from 'discord.js';
@@ -25,9 +26,12 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!queue?.isPlaying()) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'Error',
+      description: 'No hay ninguna canción en reproducción',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -35,8 +39,11 @@ export async function run({ interaction }: SlashCommandProps) {
   if (!queue.filters.equalizer) {
     const embed = EmbedGenerator.Error({
       title: 'Error',
-      description: 'Equalizer is not enabled for this track',
+      description: 'El Ecualizador no esta disponible para esta canción',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -48,11 +55,14 @@ export async function run({ interaction }: SlashCommandProps) {
   }
 
   const embed = EmbedGenerator.Success({
-    title: 'Success',
-    description: `I have successfully ${
-      state ? 'enabled' : 'disabled'
-    } the bass boost filter.`,
+    title: 'Exito!',
+    description: `He ${
+      state ? 'habilitado' : 'deshabilitado'
+    } el filtro bassboost.`,
   }).withAuthor(interaction.user);
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }

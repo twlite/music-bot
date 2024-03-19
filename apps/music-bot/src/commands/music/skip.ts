@@ -1,6 +1,7 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
-import { useQueue, useTimeline } from 'discord-player';
+import { useQueue } from 'discord-player';
 
 export const data: CommandData = {
   name: 'skip',
@@ -16,9 +17,13 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!queue?.isPlaying()) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'No hay ninguna canción',
+      description: 'No estoy reproduciendo nada ahora mismo :smiling_face_with_tear:',
     }).withAuthor(interaction.user);
+
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -26,9 +31,13 @@ export async function run({ interaction }: SlashCommandProps) {
   queue.node.skip();
 
   const embed = EmbedGenerator.Success({
-    title: 'Track skipped!',
-    description: 'I have successfully skipped to the next track.',
+    title: 'Canción saltada',
+    description: 'Ya me estaba aburriendo de esta yo tambien :wink:',
   }).withAuthor(interaction.user);
+
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }

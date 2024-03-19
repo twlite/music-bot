@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { usePlayer, useTimeline } from 'discord-player';
 
@@ -21,6 +22,9 @@ export async function run({ interaction }: SlashCommandProps) {
       title: 'Sin reproducir',
       description: 'No estoy reproduciendo nada ahora mismo',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -37,6 +41,10 @@ export async function run({ interaction }: SlashCommandProps) {
       iconURL: track.requestedBy?.displayAvatarURL(),
     },
   }).withAuthor(interaction.user);
+
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }

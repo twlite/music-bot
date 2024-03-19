@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useQueue } from 'discord-player';
 
@@ -16,9 +17,13 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!queue?.isPlaying()) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'No hay canción',
+      description: 'No se esta reproduciendo anda ahora mismo :upside_down_face:',
     }).withAuthor(interaction.user);
+
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -26,9 +31,13 @@ export async function run({ interaction }: SlashCommandProps) {
   queue.node.stop();
 
   const embed = EmbedGenerator.Success({
-    title: 'Track stopped!',
-    description: 'I have successfully stopped the track.',
+    title: 'Cola cancelada',
+    description: 'Bueno lo dejamos para otro momento :melting_face:',
   }).withAuthor(interaction.user);
+
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }

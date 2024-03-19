@@ -35,6 +35,8 @@ export const EmbedColor = {
   Info: 0x00bfaf,
 } as const;
 
+export const DeleteEmbedTime = 15000 as const;
+
 export const DiscordPlayerOptions: DiscordPlayerConfig = {
   extractorConfig: {
     YouTubeExtractor: {},

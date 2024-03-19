@@ -1,18 +1,19 @@
 import { PlayerMetadata } from '#bot/player/PlayerMetadata';
 import { fetchPlayerOptions } from '#bot/player/playerOptions';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { QueueRepeatMode, useMainPlayer } from 'discord-player';
 import { ApplicationCommandOptionType } from 'discord.js';
+import { DeleteEmbedTime } from '#bot/utils/constants';
+import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 
 export const data: CommandData = {
   name: 'play',
-  description: 'Play a song',
+  description: 'Reproduce una canción',
   options: [
     {
-      name: 'query',
+      name: 'cola',
       description:
-        'The track or playlist to play. Custom playlist id must be prefixed with "playlist:"',
+        'La canción a reproducir. Si quieres reproducir una playlist guardada utiliza "playlist:"',
       type: ApplicationCommandOptionType.String,
       autocomplete: true,
       required: true,
@@ -24,7 +25,7 @@ export async function run({ interaction }: SlashCommandProps) {
   if (!interaction.inCachedGuild()) return;
   const player = useMainPlayer();
   const channel = interaction.member.voice.channel!;
-  const query = interaction.options.getString('query', true);
+  const query = interaction.options.getString('cola', true);
 
   await interaction.deferReply();
 
@@ -34,10 +35,14 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!result.hasTracks()) {
     const embed = EmbedGenerator.Error({
-      title: 'No results found',
-      description: `No results found for \`${query}\``,
+      title: 'No hay resultados para',
+      description: `No hay resultados para \`${query}\``,
     }).withAuthor(interaction.user);
 
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
+    
     return interaction.editReply({ embeds: [embed] });
   }
 
@@ -81,14 +86,23 @@ export async function run({ interaction }: SlashCommandProps) {
         : [],
     }).withAuthor(interaction.user);
 
+
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
+
     return interaction.editReply({ embeds: [embed] });
   } catch (e) {
     console.error(e);
 
     const embed = EmbedGenerator.Error({
-      title: 'Something went wrong',
-      description: `Something went wrong while playing \`${query}\``,
+      title: 'Algo ha ido mal',
+      description: `Algo ha ido mal mientras se intentaba reproducir \`${query}\``,
     }).withAuthor(interaction.user);
+
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }

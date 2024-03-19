@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useQueue } from 'discord-player';
 import { ApplicationCommandOptionType } from 'discord.js';
@@ -25,9 +26,12 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!queue?.isPlaying()) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'Error',
+      description: 'No hay ninguna canción',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -35,9 +39,11 @@ export async function run({ interaction }: SlashCommandProps) {
   if (!queue.filters.filters) {
     const embed = EmbedGenerator.Error({
       title: 'Error',
-      description: '8D filter is not enabled for this track',
+      description: 'El filtro 8d no esta disponible para esta canción',
     }).withAuthor(interaction.user);
-
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
     return interaction.editReply({ embeds: [embed] });
   }
 
@@ -49,10 +55,13 @@ export async function run({ interaction }: SlashCommandProps) {
 
   const embed = EmbedGenerator.Success({
     title: 'Success',
-    description: `I have successfully ${
-      state ? 'enabled' : 'disabled'
-    } the 8D filter.`,
+    description: `He  ${
+      state ? 'puesto' : 'quitado'
+    } el filtro 8D.`,
   }).withAuthor(interaction.user);
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }

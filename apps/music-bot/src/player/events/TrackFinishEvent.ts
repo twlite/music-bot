@@ -3,6 +3,7 @@ import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
 import { PlayerEvent } from '../common/types.js';
 import { PlayerMetadata } from '../PlayerMetadata.js';
 import { io } from '#bot/web/index';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 
 export default class TrackFinishEvent
   implements PlayerEvent<typeof GuildQueueEvent.playerFinish>
@@ -17,14 +18,19 @@ export default class TrackFinishEvent
 
     const embed = EmbedGenerator.Success({
       description: `[${track.title}](${track.url})`,
-      title: 'Track Finished!',
-      thumbnail: { url: track.thumbnail },
+      title: 'Canción finalizada',
       footer: {
-        text: `Requested by ${track.requestedBy?.tag}`,
+        text: `Pedida por ${track.requestedBy?.tag}`,
         iconURL: track.requestedBy?.displayAvatarURL(),
       },
     });
 
-    queue.metadata.channel.send({ embeds: [embed] });
+    let message = queue.metadata.channel.send({ embeds: [embed] });
+
+    /*
+    setTimeout(async () => {
+      (await message).delete();
+    }, DeleteEmbedTime);
+    */
   }
 }

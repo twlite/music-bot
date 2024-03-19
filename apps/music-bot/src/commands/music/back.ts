@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useHistory } from 'discord-player';
 
@@ -16,18 +17,24 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!history) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'Error',
+      description: 'No hay ninguna canción en reproducción',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
 
   if (history.isEmpty()) {
     const embed = EmbedGenerator.Error({
-      title: 'No previous track',
-      description: 'There is no previous track to go back to',
+      title: 'No hay canción anterior',
+      description: 'No encuentro ninguna canción anterior que reproducir :melting_face:',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -35,9 +42,12 @@ export async function run({ interaction }: SlashCommandProps) {
   await history.back();
 
   const embed = EmbedGenerator.Success({
-    title: 'Track skipped!',
-    description: 'I have successfully skipped to the previous track.',
+    title: 'Canción saltada!',
+    description: 'Volvamos a la canción anterior :arrow_backward:',
   }).withAuthor(interaction.user);
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }

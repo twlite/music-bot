@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useQueue } from 'discord-player';
 
@@ -16,9 +17,13 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!queue) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'No hay canción en reproducción',
+      description: 'Pero si no estoy reproduciendo nada hombre :expressionless:',
     }).withAuthor(interaction.user);
+
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -26,9 +31,12 @@ export async function run({ interaction }: SlashCommandProps) {
   queue.delete();
 
   const embed = EmbedGenerator.Success({
-    title: 'Disconnected!',
-    description: 'I have successfully left the voice channel.',
+    title: 'Desconectado!',
+    description: 'Venga ya me voy, esta me la guardo :pleading_face:',
   }).withAuthor(interaction.user);
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }

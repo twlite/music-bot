@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useTimeline } from 'discord-player';
 import { ApplicationCommandOptionType } from 'discord.js';
@@ -27,9 +28,13 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!timeline?.track) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'No hay ninguna canción',
+      description: 'No estoy reproduciendo nada ahora mismo :smiling_face_with_tear:',
     }).withAuthor(interaction.user);
+
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -40,17 +45,27 @@ export async function run({ interaction }: SlashCommandProps) {
     timeline.setVolume(amount);
 
     const embed = EmbedGenerator.Success({
-      title: 'Volume changed',
-      description: `I have successfully changed the volume to ${amount}%.`,
+      title: 'Volumen cambiado',
+      description: `He cambiado el volumen a  ${amount}% :loud_sound:`,
     }).withAuthor(interaction.user);
+
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
+
 
     return interaction.editReply({ embeds: [embed] });
   }
 
   const embed = EmbedGenerator.Success({
-    title: 'Volume',
-    description: `The current volume is \`${timeline.volume}%\`.`,
+    title: 'Volumen',
+    description: `El volumen actual es de \`${timeline.volume}%\`.`,
   }).withAuthor(interaction.user);
+
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
+
 
   return interaction.editReply({ embeds: [embed] });
 }

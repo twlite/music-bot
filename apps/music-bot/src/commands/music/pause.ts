@@ -1,4 +1,5 @@
 import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { DeleteEmbedTime } from '#bot/utils/constants';
 import type { CommandData, SlashCommandProps } from 'commandkit';
 import { useTimeline } from 'discord-player';
 
@@ -16,9 +17,12 @@ export async function run({ interaction }: SlashCommandProps) {
 
   if (!timeline?.track) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: 'Error',
+      description: 'No hay ninguna canción en reproducción',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -26,8 +30,11 @@ export async function run({ interaction }: SlashCommandProps) {
   if (timeline.paused) {
     const embed = EmbedGenerator.Error({
       title: 'Error',
-      description: 'The track is already paused',
+      description: 'La canción ya esta pausada, ansias :blush:',
     }).withAuthor(interaction.user);
+    setTimeout(() => {
+      interaction.deleteReply();
+    }, DeleteEmbedTime);
 
     return interaction.editReply({ embeds: [embed] });
   }
@@ -35,9 +42,12 @@ export async function run({ interaction }: SlashCommandProps) {
   timeline.pause();
 
   const embed = EmbedGenerator.Success({
-    title: 'Paused',
-    description: 'I have successfully paused the track.',
+    title: 'Canción Pausada',
+    description: 'La canción ha sido pausada la dejamos para otro momento :stop_button:',
   }).withAuthor(interaction.user);
+  setTimeout(() => {
+    interaction.deleteReply();
+  }, DeleteEmbedTime);
 
   return interaction.editReply({ embeds: [embed] });
 }
