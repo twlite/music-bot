@@ -1,6 +1,6 @@
-import type { QueueEventHandler } from "@/types/events";
-import { syncStatistics } from "@/web/statistics";
+import type { QueueEventHandler } from '@/types/events';
+import { syncStatistics } from '@/web/statistics';
 
-const handler: QueueEventHandler<"playerResume"> = syncStatistics;
+const handler: QueueEventHandler<'playerResume'> = syncStatistics;
 
 export default handler;

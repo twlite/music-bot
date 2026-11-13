@@ -1,20 +1,11 @@
-import { config } from "@/config";
-import { definePlugin, Track } from "discord-player";
+import { config } from '@/config';
+import { definePlugin, Track } from 'discord-player';
 
 /** Limit direct native URL access to explicitly trusted media hosts. */
-export function mediaURL(
-  query: string,
-  hosts: readonly string[] = config.mediaAllowedHosts,
-) {
+export function mediaURL(query: string, hosts: readonly string[] = config.mediaAllowedHosts) {
   try {
     const url = new URL(query);
-    if (
-      url.protocol !== "https:" ||
-      url.username ||
-      url.password ||
-      (url.port && url.port !== "443")
-    )
-      return null;
+    if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443')) return null;
     if (!hosts.includes(url.hostname)) return null;
     return url;
   } catch {
@@ -22,12 +13,10 @@ export function mediaURL(
   }
 }
 export const directMedia = definePlugin({
-  id: "music-bot.direct-media",
+  id: 'music-bot.direct-media',
   setup(ctx) {
-    ctx.on("search.query.match", ({ query }) =>
-      mediaURL(query) ? { score: 1 } : null,
-    );
-    ctx.on("search.query.resolve", async ({ query, options }, { signal }) => {
+    ctx.on('search.query.match', ({ query }) => (mediaURL(query) ? { score: 1 } : null));
+    ctx.on('search.query.resolve', async ({ query, options }, { signal }) => {
       const url = mediaURL(query);
       if (!url) return { tracks: [], playlist: null };
       const metadata = await ctx.player
@@ -39,9 +28,7 @@ export const directMedia = definePlugin({
         tracks: [
           new Track({
             url: url.href,
-            title:
-              metadata?.metadata?.title ??
-              decodeURIComponent(url.pathname.split("/").pop() || url.hostname),
+            title: metadata?.metadata?.title ?? decodeURIComponent(url.pathname.split('/').pop() || url.hostname),
             author: metadata?.metadata?.artist ?? url.hostname,
             durationMS: metadata?.durationMs ?? undefined,
             requestedBy: options?.requestedBy,
@@ -49,11 +36,11 @@ export const directMedia = definePlugin({
         ],
       };
     });
-    ctx.on("track.stream", ({ track }) => {
+    ctx.on('track.stream', ({ track }) => {
       const url = mediaURL(track.url);
       if (!url)
         throw new Error(
-          "Media host is not allowed. Update mediaAllowedHosts in app.config.json for trusted providers.",
+          'Media host is not allowed. Update mediaAllowedHosts in app.config.json for trusted providers.',
         );
       return { url: url.href };
     });

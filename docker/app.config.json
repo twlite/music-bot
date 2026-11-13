@@ -20,10 +20,7 @@
     "enabled": false,
     "durationMs": 5000
   },
-  "mediaAllowedHosts": [
-    "cdn.discordapp.com",
-    "media.discordapp.net"
-  ],
+  "mediaAllowedHosts": ["cdn.discordapp.com", "media.discordapp.net"],
   "sourcePluginHosts": [
     {
       "hostId": "stream-providers",

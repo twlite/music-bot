@@ -1,13 +1,9 @@
-import { publicTrack, publicPlaylist } from "@/player/public-media";
-import { useQueue } from "@/player/runtime";
-import { SocketUser } from "../socket.js";
-import type { Socket } from "socket.io";
+import { publicTrack, publicPlaylist } from '@/player/public-media';
+import { useQueue } from '@/player/runtime';
+import { SocketUser } from '../socket.js';
+import type { Socket } from 'socket.io';
 
-export async function SearchAction(
-  info: SocketUser,
-  socket: Socket,
-  query: string,
-) {
+export async function SearchAction(info: SocketUser, socket: Socket, query: string) {
   const queue = useQueue(info.guildId);
   if (!queue?.node.session) return socket.disconnect(true);
 
@@ -17,15 +13,13 @@ export async function SearchAction(
       requestedBy: info.id,
     });
 
-    if (result.isEmpty()) return socket.emit("error", "No results found");
+    if (result.isEmpty()) return socket.emit('error', 'No results found');
 
-    return socket.emit(hasTrack ? "queued" : "play", {
+    return socket.emit(hasTrack ? 'queued' : 'play', {
       playlist: Boolean(result.playlist),
-      data: result.playlist
-        ? publicPlaylist(result.playlist)
-        : publicTrack(result.tracks[0]),
+      data: result.playlist ? publicPlaylist(result.playlist) : publicTrack(result.tracks[0]),
     });
   } catch {
-    return socket.emit("error", "No results found");
+    return socket.emit('error', 'No results found');
   }
 }

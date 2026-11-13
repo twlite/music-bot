@@ -1,6 +1,6 @@
-import { EmbedBuilder, UserResolvable } from "discord.js";
-import { EmbedColor } from "./constants.js";
-import { useClient } from "@/hooks/useClient";
+import { EmbedBuilder, UserResolvable } from 'discord.js';
+import { EmbedColor } from './constants.js';
+import { useClient } from '@/hooks/useClient';
 
 type EmbedInit = ConstructorParameters<typeof EmbedBuilder>[0];
 

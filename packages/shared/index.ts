@@ -1,4 +1,5 @@
-export type EqualizerBand = { band: number; gain: number };
+import type { EqualizerBand } from './equalizer';
+export * from './equalizer';
 export type SocketUser = {
   id: string;
   avatar: string;
@@ -9,7 +10,15 @@ export type SocketUser = {
   guildIcon: string | null;
   guildAcronym: string;
 };
+export type TrackRequester = {
+  id: string;
+  displayName: string;
+  displayAvatarURL: string | null;
+};
 export type SerializedTrack = {
+  id: string;
+  requestedBy: TrackRequester | null;
+  live: boolean;
   title: string;
   author: string;
   thumbnail: string;
@@ -38,6 +47,7 @@ export interface IStatistics {
     progress: number;
   } | null;
   sentAt: number;
+  connected: boolean;
   listeners: number;
   tracks: number;
   volume: number;
@@ -46,6 +56,9 @@ export interface IStatistics {
   track: SerializedTrack | null;
   equalizer: EqualizerBand[];
   shuffle: boolean;
+  effects: string[];
+  effectPresets: { name: string; label: string }[];
+  equalizerPreset: string;
 }
 export type QueueData = {
   playlist: boolean;
@@ -64,6 +77,8 @@ export interface SocketEvents {
   pause: [boolean];
   ready: [SocketUser];
   shuffle: [boolean];
+  lyrics: [DashboardLyrics];
+  queue: [SerializedTrack[]];
 }
 export interface SocketActions {
   play: [string];
@@ -75,4 +90,17 @@ export interface SocketActions {
   loop: [QueueRepeatMode];
   equalizer: [EqualizerBand[]];
   shuffle: [boolean];
+  seek: [{ trackId: string; positionMs: number }];
+  effect: [{ name: string; enabled: boolean }];
+  queueRemove: [{ trackId: string }];
+  queueMove: [{ trackId: string; beforeId: string | null }];
+  queueNext: [{ trackId: string }];
+  lyrics: [{ trackId: string }];
 }
+
+export type DashboardLyrics = {
+  trackId: string;
+  status: 'ready' | 'unavailable' | 'error';
+  lines: { timestampMs: number; line: string }[];
+  plain: string | null;
+};

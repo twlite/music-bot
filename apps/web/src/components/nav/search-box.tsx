@@ -1,38 +1,34 @@
-import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { Input } from "../ui/input";
-import { useCallback, useEffect, useState } from "react";
-import { SerializedPlaylist, SerializedTrack } from "@music-bot/shared";
-import { useDebounce } from "@/hooks/useDebounce";
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { Input } from '../ui/input';
+import { useCallback, useEffect, useState } from 'react';
+import { SerializedPlaylist, SerializedTrack } from '@music-bot/shared';
+import { useDebounce } from '@/hooks/useDebounce';
 
-import { useFetch } from "@/hooks/useFetch";
-import { AlbumCover } from "../player/album-cover";
-import { useSocket } from "@/context/socket.context";
+import { useFetch } from '@/hooks/useFetch';
+import { AlbumCover } from '../player/album-cover';
+import { useSocket } from '@/context/socket.context';
 
 type ResponseData = Array<SerializedTrack | SerializedPlaylist>;
 
 export function SearchBox() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 1000);
   const { data, error, loading, execute } = useFetch<ResponseData>([]);
   const { send } = useSocket();
 
   useEffect(() => {
     if (!debouncedQuery) return;
-    execute(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/search?query=${encodeURIComponent(debouncedQuery)}`,
-    );
+    execute(`${process.env.NEXT_PUBLIC_BACKEND_URL}/search?query=${encodeURIComponent(debouncedQuery)}`);
   }, [debouncedQuery]);
 
   const handleSelection = useCallback(
     (selection: ResponseData[number]) => {
       const regex = /^playlist:[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}$/;
 
-      const key = regex.test(debouncedQuery)
-        ? debouncedQuery
-        : selection.url || selection.title;
+      const key = regex.test(debouncedQuery) ? debouncedQuery : selection.url || selection.title;
 
-      if (key) send("play", key);
-      setQuery("");
+      if (key) send('play', key);
+      setQuery('');
     },
     [send, debouncedQuery],
   );
@@ -69,7 +65,7 @@ export function SearchBox() {
               </svg>
             </div>
           ) : error ? (
-            "An error occurred!"
+            'An error occurred!'
           ) : (
             <SearchResult data={data} onClick={handleSelection} />
           )}
@@ -79,37 +75,21 @@ export function SearchBox() {
   );
 }
 
-function SearchResult({
-  data,
-  onClick,
-}: {
-  data: ResponseData | null;
-  onClick: (item: ResponseData[number]) => void;
-}) {
+function SearchResult({ data, onClick }: { data: ResponseData | null; onClick: (item: ResponseData[number]) => void }) {
   if (!data?.length) return <span>No results found!</span>;
 
   return (
     <div className="space-y-2">
       {data.map((item) => (
-        <div
-          key={item.url}
-          className="cursor-pointer hover:bg-card/50 p-2 rounded-md"
-          onClick={() => onClick(item)}
-        >
+        <div key={item.url} className="cursor-pointer hover:bg-card/50 p-2 rounded-md" onClick={() => onClick(item)}>
           <div className="flex gap-4 items-center">
-            <AlbumCover
-              fallback={item.title}
-              icon={item.thumbnail}
-              className="h-10 w-10"
-            />
+            <AlbumCover fallback={item.title} icon={item.thumbnail} className="h-10 w-10" />
             <div className="space-y-2 text-start">
               <h1 className="text-base font-semibold">{item.title}</h1>
               <h4 className="text-muted-foreground text-sm">
-                {typeof item.author === "string"
-                  ? item.author
-                  : item.author.name}
-                {" • "}
-                {"tracks" in item ? "Playlist" : "Track"}
+                {typeof item.author === 'string' ? item.author : item.author.name}
+                {' • '}
+                {'tracks' in item ? 'Playlist' : 'Track'}
               </h4>
             </div>
           </div>

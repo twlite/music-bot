@@ -13,7 +13,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   await interaction.deferReply();
 
-  const history = useHistory(interaction.guildId);
+  const history = useHistory();
 
   if (!history) {
     const embed = EmbedGenerator.Error({

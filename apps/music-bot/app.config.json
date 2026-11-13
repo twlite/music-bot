@@ -12,18 +12,15 @@
     "socketAdapter": false
   },
   "remedia": {
-    "mode": "embedded",
+    "mode": "remote",
     "url": "remedia://127.0.0.1:8787",
     "username": "media-bot"
   },
   "crossfade": {
-    "enabled": false,
+    "enabled": true,
     "durationMs": 5000
   },
-  "mediaAllowedHosts": [
-    "cdn.discordapp.com",
-    "media.discordapp.net"
-  ],
+  "mediaAllowedHosts": ["cdn.discordapp.com", "media.discordapp.net"],
   "sourcePluginHosts": [
     {
       "hostId": "stream-providers",

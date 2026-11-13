@@ -1,9 +1,6 @@
-import { GatewayIntentBits } from "discord.js";
+import { GatewayIntentBits } from 'discord.js';
 
-export const ClientIntents = [
-  GatewayIntentBits.Guilds,
-  GatewayIntentBits.GuildVoiceStates,
-] as const;
+export const ClientIntents = [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] as const;
 
 export const EmbedColor = {
   Success: 0x00fa9a,

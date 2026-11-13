@@ -13,7 +13,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   await interaction.deferReply();
 
-  const timeline = useTimeline(interaction.guildId);
+  const timeline = useTimeline();
 
   if (!timeline?.track) {
     const embed = EmbedGenerator.Error({

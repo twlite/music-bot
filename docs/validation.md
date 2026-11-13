@@ -51,3 +51,13 @@ The bot uses `commandkit dev` and `commandkit build`. CommandKit rewrites the `@
 `commandkit-plugin-discord-player` forwards queue events to `src/app/events/(discord-player)` and player events to `(discord-player-main)`. Version 1.0.0 targets older APIs, so the checked-in pnpm patch updates the v8 event enum, Discord.js `clientReady`, and guild-ID context. No custom filesystem event loader is used.
 
 CommandKit 1.2.6 also has a namespace-router patch: each event gets its own listener list, and lookup keys include the namespace. A regression test covers sibling isolation and same-name events in different namespaces. Built-output verification emits a v8 track-start event through the plugin and checks that exactly one discovered announcement runs.
+
+## Dashboard controls
+
+The current dashboard adds seek debouncing, queue ID edits, requester snapshots, independent effect switches and synchronized/plain lyrics. EQ curves are shared with the server and registered as named Discord Player presets. Custom 15-band settings are retained. LRCLIB uses the official `@discord-player/plugin-host` plugin; no separate HTTP provider is implemented in this app.
+
+Bot tests exercise every EQ preset payload, named/custom EQ composition, concurrent effect persistence, queue edits, stale seeks, public requester metadata, lyrics cancellation/coalescing and `/join` behavior. Dashboard DOM tests exercise keyboard scrubbing, seek cancellation on track changes, effect toggles, queue moves/removals, adding queries, lyric timing and late-client state hydration/listener cleanup. These checks do not establish live Discord playback, actual browser drag behavior or production LRCLIB availability.
+
+The root `pnpm format` and `pnpm format:check` commands use the copied Discord Player oxfmt settings. Local environment files, local Remedia configuration and generated output are excluded. Command handlers use native context-aware Discord Player hooks; CommandKit supplies their guild ID. HTTP and Socket.IO handlers retain explicit guild IDs.
+
+Executed for this dashboard update: 76 tests (65 bot, 11 dashboard DOM), root typecheck/lint/format checks, both application builds, and a compiled shared-preset import check. FFmpeg 9 native null-output playback passed for all 22 exposed effects individually and for combined custom EQ, bass boost, vocal boost and 8D. These native checks do not connect to Discord or validate remote audio output. The README labels its screenshot as the earlier layout.

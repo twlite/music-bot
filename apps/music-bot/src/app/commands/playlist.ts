@@ -1,3 +1,4 @@
+import { publicTrack } from '@/player/public-media';
 import { useQueue } from '@/player/runtime';
 import { serialize } from 'discord-player';
 import { EmbedGenerator } from '@/utils/embed-generator.js';
@@ -99,7 +100,7 @@ async function handleCreatePlaylist({ interaction }: ChatInputCommandContext) {
     ephemeral: isPrivate,
   });
 
-  const queue = useQueue(interaction.guildId!);
+  const queue = useQueue();
 
   if (!queue) {
     const embed = EmbedGenerator.Error({
@@ -134,7 +135,7 @@ async function handleCreatePlaylist({ interaction }: ChatInputCommandContext) {
 
   const tracks = [queue.currentTrack, ...queue.tracks.toArray()]
     .filter(Boolean)
-    .map((track) => serialize(track!));
+    .map((track) => ({ ...serialize(track!), requester: publicTrack(track!).requestedBy }));
 
   const playlist = await db.playlist.create({
     name,
@@ -204,10 +205,7 @@ async function handleListPlaylists({ interaction }: ChatInputCommandContext) {
     return interaction.editReply({
       embeds: [
         EmbedGenerator.Error({
-          description:
-            page === 0
-              ? 'You have no saved playlists.'
-              : `No items found for page ${page + 1}!`,
+          description: page === 0 ? 'You have no saved playlists.' : `No items found for page ${page + 1}!`,
           title: 'Error!',
         }).withAuthor(interaction.user),
       ],
@@ -217,10 +215,7 @@ async function handleListPlaylists({ interaction }: ChatInputCommandContext) {
   const embed = EmbedGenerator.Success({
     title: 'Your custom playlists',
     description: playlists
-      .map(
-        (playlist, idx) =>
-          `${++idx}. **${playlist.name}** - \`playlist:${playlist.id}\``,
-      )
+      .map((playlist, idx) => `${++idx}. **${playlist.name}** - \`playlist:${playlist.id}\``)
       .join('\n'),
     footer: {
       text: `You have total ${playlists.length}/50 playlists.`,

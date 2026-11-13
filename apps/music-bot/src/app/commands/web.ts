@@ -1,12 +1,12 @@
-import { config } from "@/config";
-import type { ChatInputCommandContext } from "./_types.js";
-import { generateSession } from "@/player/session";
-import type { CommandData } from "commandkit";
-import { ButtonStyle, ComponentType } from "discord.js";
+import { config } from '@/config';
+import type { ChatInputCommandContext } from './_types.js';
+import { generateSession } from '@/player/session';
+import type { CommandData } from 'commandkit';
+import { ButtonStyle, ComponentType } from 'discord.js';
 
 export const command: CommandData = {
-  name: "web",
-  description: "Get address to the web interface",
+  name: 'web',
+  description: 'Get address to the web interface',
 };
 
 export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
@@ -26,8 +26,8 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
           {
             type: ComponentType.Button,
             style: ButtonStyle.Link,
-            label: "Open",
-            emoji: "🌐",
+            label: 'Open',
+            emoji: '🌐',
             url,
           },
         ],

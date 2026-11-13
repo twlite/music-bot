@@ -23,7 +23,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
   const state = interaction.options.getBoolean('state', true);
   await interaction.deferReply();
 
-  const queue = useQueue(interaction.guildId);
+  const queue = useQueue();
 
   if (!queue?.isPlaying()) {
     const embed = EmbedGenerator.Error({
@@ -38,9 +38,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   const embed = EmbedGenerator.Success({
     title: 'Success',
-    description: `I have successfully ${
-      state ? 'enabled' : 'disabled'
-    } the bass boost filter.`,
+    description: `I have successfully ${state ? 'enabled' : 'disabled'} the bass boost filter.`,
   }).withAuthor(interaction.user);
 
   return interaction.editReply({ embeds: [embed] });

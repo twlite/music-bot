@@ -4,11 +4,7 @@ import type { Socket } from 'socket.io';
 import { PlayerMetadata } from '@/player/player-metadata.js';
 import { EmbedGenerator } from '@/utils/embed-generator.js';
 
-export async function PauseAction(
-  info: SocketUser,
-  socket: Socket,
-  paused: boolean,
-) {
+export async function PauseAction(info: SocketUser, socket: Socket, paused: boolean) {
   const queue = useQueue<PlayerMetadata>(info.guildId);
   if (!queue?.node.session) return socket.disconnect(true);
 
@@ -21,9 +17,7 @@ export async function PauseAction(
       embeds: [
         EmbedGenerator.Success({
           title: `Track ${state ? 'paused' : 'resumed'}!`,
-          description: `The track was ${state ? 'paused' : 'resumed'} by ${
-            info.displayName
-          } (<@${info.id}>).`,
+          description: `The track was ${state ? 'paused' : 'resumed'} by ${info.displayName} (<@${info.id}>).`,
         }),
       ],
     });

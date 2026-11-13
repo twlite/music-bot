@@ -30,7 +30,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   await interaction.deferReply();
 
-  const queue = useQueue(interaction.guildId);
+  const queue = useQueue();
   const db = useDatabase();
 
   if (!queue?.isPlaying()) {
@@ -62,7 +62,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
           loopMode: mode,
         },
         {
-          new: true,
+          returnDocument: 'after',
           upsert: true,
         },
       )
@@ -72,9 +72,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   const embed = EmbedGenerator.Success({
     title: 'Repeat mode',
-    description: `The current repeat mode is \`${
-      ['OFF', 'TRACK', 'QUEUE', 'AUTOPLAY'][queue.repeatMode]
-    }\`.`,
+    description: `The current repeat mode is \`${['OFF', 'TRACK', 'QUEUE', 'AUTOPLAY'][queue.repeatMode]}\`.`,
   }).withAuthor(interaction.user);
 
   return interaction.editReply({ embeds: [embed] });

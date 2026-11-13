@@ -1,24 +1,24 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
 minimumReleaseAgeExclude:
-  - "@remedia/client@0.2.1"
-  - "@remedia/node-android-arm-eabi@0.2.1"
-  - "@remedia/node-android-arm64@0.2.1"
-  - "@remedia/node-darwin-arm64@0.2.1"
-  - "@remedia/node-darwin-x64@0.2.1"
-  - "@remedia/node-freebsd-x64@0.2.1"
-  - "@remedia/node-linux-arm-gnueabihf@0.2.1"
-  - "@remedia/node-linux-arm64-gnu@0.2.1"
-  - "@remedia/node-linux-arm64-musl@0.2.1"
-  - "@remedia/node-linux-x64-gnu@0.2.1"
-  - "@remedia/node-linux-x64-musl@0.2.1"
-  - "@remedia/node-win32-arm64-msvc@0.2.1"
-  - "@remedia/node-win32-ia32-msvc@0.2.1"
-  - "@remedia/node-win32-x64-msvc@0.2.1"
-  - "@remedia/node@0.2.1"
-  - "@discord-player/plugin-host@8.0.0-dev.5"
-  - "@remedia/plugin-host@0.2.1"
+  - '@remedia/client@0.2.1'
+  - '@remedia/node-android-arm-eabi@0.2.1'
+  - '@remedia/node-android-arm64@0.2.1'
+  - '@remedia/node-darwin-arm64@0.2.1'
+  - '@remedia/node-darwin-x64@0.2.1'
+  - '@remedia/node-freebsd-x64@0.2.1'
+  - '@remedia/node-linux-arm-gnueabihf@0.2.1'
+  - '@remedia/node-linux-arm64-gnu@0.2.1'
+  - '@remedia/node-linux-arm64-musl@0.2.1'
+  - '@remedia/node-linux-x64-gnu@0.2.1'
+  - '@remedia/node-linux-x64-musl@0.2.1'
+  - '@remedia/node-win32-arm64-msvc@0.2.1'
+  - '@remedia/node-win32-ia32-msvc@0.2.1'
+  - '@remedia/node-win32-x64-msvc@0.2.1'
+  - '@remedia/node@0.2.1'
+  - '@discord-player/plugin-host@8.0.0-dev.5'
+  - '@remedia/plugin-host@0.2.1'
   - discord-player@8.0.0-dev.5
 patchedDependencies:
   commandkit-plugin-discord-player@1.0.0: patches/commandkit-plugin-discord-player@1.0.0.patch

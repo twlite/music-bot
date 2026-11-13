@@ -4,11 +4,7 @@ import type { Socket } from 'socket.io';
 import { PlayerMetadata } from '@/player/player-metadata.js';
 import { EmbedGenerator } from '@/utils/embed-generator.js';
 
-export async function SkipAction(
-  info: SocketUser,
-  socket: Socket,
-  back = false,
-) {
+export async function SkipAction(info: SocketUser, socket: Socket, back = false) {
   const queue = useQueue<PlayerMetadata>(info.guildId);
   if (!queue?.node.session) return socket.disconnect(true);
 

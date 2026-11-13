@@ -1,19 +1,8 @@
-import {
-  SpeakerLoudIcon,
-  SpeakerModerateIcon,
-  SpeakerOffIcon,
-  SpeakerQuietIcon,
-} from '@radix-ui/react-icons';
+import { SpeakerLoudIcon, SpeakerModerateIcon, SpeakerOffIcon, SpeakerQuietIcon } from '@radix-ui/react-icons';
 import { useEffect, useState } from 'react';
 import { Slider } from '../ui/slider';
 
-export function VolumeController({
-  volume,
-  onChange,
-}: {
-  volume: number;
-  onChange: (volume: number) => void;
-}) {
+export function VolumeController({ volume, onChange }: { volume: number; onChange: (volume: number) => void }) {
   const [currentValue, setCurrentValue] = useState(volume);
 
   const icon =

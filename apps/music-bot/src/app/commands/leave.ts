@@ -13,7 +13,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   await interaction.deferReply();
 
-  const queue = useQueue(interaction.guildId);
+  const queue = useQueue();
 
   if (!queue) {
     const embed = EmbedGenerator.Error({

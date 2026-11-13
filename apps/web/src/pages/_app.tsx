@@ -1,15 +1,15 @@
-import { AppProps } from "next/app";
-import "../styles/globals.css";
-import { Inter } from "next/font/google";
-import { useRouter } from "next/router";
-import { useEffect, useState, useRef } from "react";
-import { SocketContextProvider, useSocket } from "@/context/socket.context";
-import { InvalidSession } from "@/components/auth/InvalidSession";
-import type { SocketUser } from "@music-bot/shared";
-import { ThemeProvider } from "@/components/theme";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { AppProps } from 'next/app';
+import '../styles/globals.css';
+import { Inter } from 'next/font/google';
+import { useRouter } from 'next/router';
+import { useEffect, useState, useRef } from 'react';
+import { SocketContextProvider, useSocket } from '@/context/socket.context';
+import { InvalidSession } from '@/components/auth/InvalidSession';
+import type { SocketUser } from '@music-bot/shared';
+import { ThemeProvider } from '@/components/theme';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -27,26 +27,22 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
     };
 
     const onSession = (session: SocketUser) => {
-      sessionStorage.setItem("session", JSON.stringify(session));
+      sessionStorage.setItem('session', JSON.stringify(session));
     };
 
     if (!router.isReady) return;
-    socket.on("ready", onSession);
-    socket.on("connect", onConnect);
-    socket.on("connect_error", onError);
-    const code =
-      typeof router.query.session === "string" ? router.query.session : null;
+    socket.on('ready', onSession);
+    socket.on('connect', onConnect);
+    socket.on('connect_error', onError);
+    const code = typeof router.query.session === 'string' ? router.query.session : null;
     if (code) {
-      window.history.replaceState({}, "", "/");
-      exchange.current ??= fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/exchange`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code }),
-        },
-      );
+      window.history.replaceState({}, '', '/');
+      exchange.current ??= fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/exchange`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
       void exchange.current
         .then((res) => {
           if (res.ok) socket.connect();
@@ -57,19 +53,14 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
 
     return () => {
       socket.disconnect();
-      socket.off("connect", onConnect);
-      socket.off("connect_error", onError);
-      socket.off("ready", onSession);
+      socket.off('connect', onConnect);
+      socket.off('connect_error', onError);
+      socket.off('ready', onSession);
     };
   }, [router.isReady, socket]);
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <SocketContextProvider>
         <div className={inter.className}>
           {invalidSession ? (

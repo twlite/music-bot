@@ -1,3 +1,6 @@
+import { syncStatistics } from '@/web/statistics';
+import { requester } from '@/player/requester';
+import { rememberEffects } from '@/player/effects';
 import type { AutocompleteCommand } from 'commandkit';
 import type { ChatInputCommandContext } from './_types.js';
 import { queueDefaults } from '@/player/effects';
@@ -15,8 +18,7 @@ export const command: CommandData = {
   options: [
     {
       name: 'query',
-      description:
-        'The track or playlist to play. Custom playlist id must be prefixed with "playlist:"',
+      description: 'The track or playlist to play. Custom playlist id must be prefixed with "playlist:"',
       type: ApplicationCommandOptionType.String,
       autocomplete: true,
       required: true,
@@ -33,8 +35,10 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
   await interaction.deferReply();
 
   const result = await player.search(query, {
-    requestedBy: interaction.user.id,
+    requestedBy: requester(interaction.user),
   });
+
+  for (const track of result.tracks) track.requestedBy = requester(interaction.user);
 
   if (!result.tracks.length) {
     const embed = EmbedGenerator.Error({
@@ -48,22 +52,23 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
   try {
     const playerOptions = await fetchPlayerOptions(interaction.guildId);
 
-    const { searchResult } = await player.play(channel, result, {
+    const { searchResult, queue } = await player.play(channel, result, {
       nodeOptions: {
         metadata: PlayerMetadata.create(interaction),
         ...queueDefaults(playerOptions),
       },
-      requestedBy: interaction.user.id,
+      requestedBy: requester(interaction.user),
       selfDeaf: true,
     });
+
+    rememberEffects(queue, playerOptions);
+    syncStatistics(queue);
 
     const embed = EmbedGenerator.Info({
       title: `${Boolean(searchResult.playlist) ? 'Playlist' : 'Track'} queued!`,
       thumbnail: { url: searchResult.tracks[0].thumbnail },
       description: `[${searchResult.tracks[0].title}](${searchResult.tracks[0].url})`,
-      fields: searchResult.playlist
-        ? [{ name: 'Playlist', value: searchResult.playlist.title }]
-        : [],
+      fields: searchResult.playlist ? [{ name: 'Playlist', value: searchResult.playlist.title }] : [],
     }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
@@ -80,8 +85,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 };
 
 export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
-  if (!interaction.isAutocomplete() || interaction.commandName !== 'play')
-    return;
+  if (!interaction.isAutocomplete() || interaction.commandName !== 'play') return;
   const query = interaction.options.getString('query', true);
 
   if (!query.length) return interaction.respond([]);
@@ -90,7 +94,7 @@ export const autocomplete: AutocompleteCommand = async ({ interaction }) => {
     const player = useMainPlayer();
 
     const data = await player.search(query, {
-      requestedBy: interaction.user.id,
+      requestedBy: requester(interaction.user),
     });
 
     if (!data.tracks.length) return interaction.respond([]);

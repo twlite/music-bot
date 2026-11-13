@@ -24,7 +24,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   await interaction.deferReply();
 
-  const timeline = useTimeline(interaction.guildId);
+  const timeline = useTimeline();
 
   if (!timeline?.track) {
     const embed = EmbedGenerator.Error({
@@ -38,7 +38,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
   const amount = interaction.options.getInteger('value', false);
 
   if (amount != null) {
-    timeline.setVolume(amount);
+    await timeline.setVolume(amount);
 
     const embed = EmbedGenerator.Success({
       title: 'Volume changed',

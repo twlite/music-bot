@@ -3,11 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "description": "Discord music bot example built with discord-player.",
-  "main": "dist/index.js",
+  "keywords": [],
+  "license": "MIT",
+  "author": "twlite",
+  "files": [
+    "dist",
+    "app.config.json",
+    "commandkit.config.ts"
+  ],
   "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "build": "commandkit build",
-    "start": "node dist/index.js",
+    "start": "node --enable-source-maps --env-file-if-exists .env dist/index.js",
     "dev": "commandkit dev",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
@@ -15,10 +23,8 @@
     "test:native": "node scripts/native-smoke.mjs",
     "test:remote": "node scripts/remote-smoke.mjs"
   },
-  "keywords": [],
-  "author": "twlite",
-  "license": "MIT",
   "dependencies": {
+    "@discord-player/plugin-host": "8.0.0-dev.5",
     "@music-bot/shared": "workspace:*",
     "@remedia/client": "0.2.1",
     "@remedia/node": "0.2.1",
@@ -42,10 +48,5 @@
     "tsconfig": "workspace:*",
     "typescript": "^6.0.3",
     "vitest": "5.1.0"
-  },
-  "files": [
-    "dist",
-    "app.config.json",
-    "commandkit.config.ts"
-  ]
+  }
 }

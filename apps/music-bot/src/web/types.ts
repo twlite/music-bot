@@ -1,1 +1,1 @@
-export * from "@music-bot/shared";
+export * from '@music-bot/shared';

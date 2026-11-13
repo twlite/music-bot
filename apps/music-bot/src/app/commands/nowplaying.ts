@@ -1,3 +1,4 @@
+import { publicTrack } from '@/player/public-media';
 import type { ChatInputCommandContext } from './_types.js';
 import { EmbedGenerator } from '@/utils/embed-generator.js';
 import type { CommandData } from 'commandkit';
@@ -13,8 +14,8 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   await interaction.deferReply();
 
-  const node = usePlayer(interaction.guildId)!;
-  const timeline = useTimeline(interaction.guildId);
+  const node = usePlayer()!;
+  const timeline = useTimeline();
 
   // this will also verify if usePlayer's value is null
   if (!timeline?.track) {
@@ -34,7 +35,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
     fields: [{ name: 'Progress', value: node.createProgressBar()! }],
     thumbnail: { url: track.thumbnail },
     footer: {
-      text: `Requested by ${String(track.requestedBy ?? 'unknown')} • ${timestamp?.progress ?? 0}%`,
+      text: `Requested by ${publicTrack(track).requestedBy?.displayName ?? 'Autoplay'} • ${timestamp?.progress ?? 0}%`,
       iconURL: undefined,
     },
   }).withAuthor(interaction.user);

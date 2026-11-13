@@ -2,5 +2,12 @@
   "name": "@music-bot/shared",
   "version": "1.0.0",
   "private": true,
-  "types": "index.ts"
+  "type": "module",
+  "types": "index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
+    }
+  }
 }

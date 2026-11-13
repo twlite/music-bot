@@ -17,8 +17,7 @@ const handler: QueueEventHandler<'playerStart'> = async (queue, track) => {
     },
   });
 
-  if (queue.metadata.channel.isSendable())
-    await queue.metadata.channel.send({ embeds: [embed] });
+  if (queue.metadata.channel.isSendable()) await queue.metadata.channel.send({ embeds: [embed] });
 };
 
 export default handler;

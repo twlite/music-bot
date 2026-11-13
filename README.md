@@ -6,6 +6,8 @@ Features include search and autocomplete, saved private or public playlists, pre
 
 ![Dashboard](assets/image.png)
 
+The screenshot shows the earlier layout. The current dashboard adds queue management, synced lyrics and a Sound tab; see [dashboard controls](docs/dashboard.md).
+
 **Migration status:** this branch uses a development release of Discord Player. Local builds, tests and native playback checks are described in [validation](docs/validation.md). Live Discord/provider playback and the complete Compose stack have not been certified. The remote profile builds the official Remedia Dockerfile at a pinned source revision, using published 0.2.1 binaries. Embedded Docker provisions FFmpeg independently. Neither path compiles Remedia or FFmpeg.
 
 ## Before you start
@@ -42,6 +44,8 @@ For access from another computer, put an HTTPS reverse proxy in front of these l
 ## Play your first song
 
 Join a voice channel and run `/play query:Daft Punk One More Time`, or paste a YouTube, Spotify, Apple Music or SoundCloud track URL. The included source host supplies these providers. Spotify and Apple Music catalog tracks use the extractors' matching-stream bridge rather than streaming protected catalog audio. Provider availability depends on the service and your network. You can also upload audio to Discord and use its HTTPS attachment URL; other direct audio hosts must be listed in `mediaAllowedHosts` in `app.config.json`.
+
+Use `/join` to connect and prepare an empty queue before opening `/web`. You can then add songs from the dashboard, reorder or remove upcoming tracks, scrub the timeline, combine audio effects and follow synced lyrics. See [dashboard controls](docs/dashboard.md).
 
 Use `/pause`, `/resume`, `/skip`, `/back`, `/seek`, `/shuffle`, `/volume`, `/loop`, `/stop` and `/leave`. `/playlist create` saves the current and upcoming tracks; `/playlist list` shows your IDs. Play one with `/play query:playlist:<id>`.
 
@@ -97,11 +101,14 @@ See [backup, restore, upgrades and rollback](docs/operations.md), [saved playlis
 ## Development checks
 
 ```sh
+pnpm format:check
 pnpm test
 pnpm typecheck
 pnpm lint
 pnpm build
 pnpm --filter music-bot exec node scripts/native-smoke.mjs
 ```
+
+`pnpm format` applies the shared oxfmt configuration. `pnpm test` runs bot and dashboard tests.
 
 The last command requires FFmpeg 9 and checks local native decoding with a null output, filters, crossfade preparation and controls. It does not connect to Discord. Provider limitations and the remaining live validation checklist are recorded in [validation](docs/validation.md).

@@ -1,28 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 export function useFetch<T = unknown>(initialValue?: T) {
   const [config, setConfig] = useState<{
     info: RequestInfo;
     init: RequestInit;
   }>({
-    info: "",
+    info: '',
     init: {},
   });
   const [data, setData] = useState<T | null>(initialValue ?? null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const _fetch = (
-    info: RequestInfo,
-    init: RequestInit,
-    controller: AbortController,
-  ) => {
+  const _fetch = (info: RequestInfo, init: RequestInit, controller: AbortController) => {
     setLoading(true);
     fetch(info, {
       ...init,
-      credentials: "include",
+      credentials: 'include',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...init?.headers,
       },
       signal: controller.signal,
@@ -56,15 +52,12 @@ export function useFetch<T = unknown>(initialValue?: T) {
     };
   }, [config]);
 
-  const execute = useCallback(
-    (query: RequestInfo, options: RequestInit = {}) => {
-      setConfig({
-        info: query,
-        init: options,
-      });
-    },
-    [],
-  );
+  const execute = useCallback((query: RequestInfo, options: RequestInit = {}) => {
+    setConfig({
+      info: query,
+      init: options,
+    });
+  }, []);
 
   return { data, loading, error, execute };
 }

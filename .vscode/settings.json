@@ -4,5 +4,8 @@
       "mode": "auto"
     }
   ],
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "json.schemaDownload.trustedDomains": {
+    "https://remedia.twlite.dev/schemas/": true
+  }
 }

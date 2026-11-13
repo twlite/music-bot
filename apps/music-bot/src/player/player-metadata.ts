@@ -1,10 +1,4 @@
-import {
-  CommandInteraction,
-  Guild,
-  GuildChannel,
-  TextBasedChannel,
-  VoiceChannel,
-} from "discord.js";
+import { CommandInteraction, Guild, GuildChannel, TextBasedChannel, VoiceChannel } from 'discord.js';
 
 type ChannelInferrable = {
   channel: TextBasedChannel | VoiceChannel;
@@ -14,11 +8,11 @@ type ChannelInferrable = {
 export class PlayerMetadata {
   public constructor(public data: ChannelInferrable) {
     if (data.channel.isDMBased()) {
-      throw new Error("PlayerMetadata cannot be created from a DM");
+      throw new Error('PlayerMetadata cannot be created from a DM');
     }
 
     if (!data.channel) {
-      throw new Error("PlayerMetadata can only be created from a channel");
+      throw new Error('PlayerMetadata can only be created from a channel');
     }
   }
 
@@ -33,7 +27,7 @@ export class PlayerMetadata {
   public static create(data: ChannelInferrable | CommandInteraction) {
     if (data instanceof CommandInteraction) {
       if (!data.inGuild()) {
-        throw new Error("PlayerMetadata cannot be created from a DM");
+        throw new Error('PlayerMetadata cannot be created from a DM');
       }
 
       return new PlayerMetadata({ channel: data.channel!, guild: data.guild! });

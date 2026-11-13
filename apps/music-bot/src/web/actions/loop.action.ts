@@ -5,11 +5,7 @@ import type { Socket } from 'socket.io';
 import { PlayerMetadata } from '@/player/player-metadata.js';
 import { EmbedGenerator } from '@/utils/embed-generator.js';
 
-export async function LoopAction(
-  info: SocketUser,
-  socket: Socket,
-  mode: 0 | 1 | 2 | 3,
-) {
+export async function LoopAction(info: SocketUser, socket: Socket, mode: 0 | 1 | 2 | 3) {
   const queue = useQueue<PlayerMetadata>(info.guildId);
   if (!queue?.node.session) return socket.disconnect(true);
 

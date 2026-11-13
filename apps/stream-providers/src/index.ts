@@ -1,9 +1,9 @@
-import { createSourcePluginHost } from "@discord-player/plugin-host";
-import { AppleMusicExtractor } from "discord-player-applemusic";
-import { SoundcloudExtractor } from "discord-player-soundcloud";
-import { SpotifyExtractor } from "discord-player-spotify";
-import { YoutubeExtractor } from "discord-player-youtubei";
-import { z } from "zod";
+import { createSourcePluginHost } from '@discord-player/plugin-host';
+import { AppleMusicExtractor } from 'discord-player-applemusic';
+import { SoundcloudExtractor } from 'discord-player-soundcloud';
+import { SpotifyExtractor } from 'discord-player-spotify';
+import { YoutubeExtractor } from 'discord-player-youtubei';
+import { z } from 'zod';
 
 const config = z
   .strictObject({
@@ -13,14 +13,12 @@ const config = z
     port: z.number().int().min(1).max(65535),
     publicUrl: z.url(),
   })
-  .parse(await Bun.file("app.config.json").json());
+  .parse(await Bun.file('app.config.json').json());
 
 const token = process.env.STREAM_PROVIDERS_TOKEN;
 
 if (!token || token.length < 16 || token.length > 4096 || /\s/.test(token)) {
-  throw new Error(
-    "Set STREAM_PROVIDERS_TOKEN to a 16–4096 character secret without whitespace.",
-  );
+  throw new Error('Set STREAM_PROVIDERS_TOKEN to a 16–4096 character secret without whitespace.');
 }
 
 const host = createSourcePluginHost({
@@ -31,15 +29,7 @@ const host = createSourcePluginHost({
 });
 
 try {
-  await host.extractors.loadMulti(
-    [
-      YoutubeExtractor,
-      SpotifyExtractor,
-      AppleMusicExtractor,
-      SoundcloudExtractor,
-    ],
-    {},
-  );
+  await host.extractors.loadMulti([YoutubeExtractor, SpotifyExtractor, AppleMusicExtractor, SoundcloudExtractor], {});
 } catch (error) {
   await host.close();
   throw error;
@@ -53,11 +43,11 @@ const server = Bun.serve({
   fetch(request, server) {
     const pathname = new URL(request.url).pathname;
 
-    if (pathname === "/health") {
-      return Response.json({ status: "ok" });
+    if (pathname === '/health') {
+      return Response.json({ status: 'ok' });
     }
 
-    if (pathname.startsWith("/remedia/v1/media/")) {
+    if (pathname.startsWith('/remedia/v1/media/')) {
       server.timeout(request, 0);
     }
 
@@ -80,12 +70,12 @@ async function shutdown() {
     clearTimeout(deadline);
     process.exit(0);
   } catch {
-    console.error("Stream provider cleanup failed.");
+    console.error('Stream provider cleanup failed.');
     process.exit(1);
   }
 }
 
-process.once("SIGINT", shutdown);
-process.once("SIGTERM", shutdown);
+process.once('SIGINT', shutdown);
+process.once('SIGTERM', shutdown);
 
 console.log(`Stream providers listening at ${config.publicUrl}`);

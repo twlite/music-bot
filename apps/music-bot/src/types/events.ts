@@ -1,8 +1,4 @@
-import type {
-  DiscordPlayerEvents,
-  GuildQueue,
-  GuildQueueEventsMap,
-} from 'discord-player';
+import type { DiscordPlayerEvents, GuildQueue, GuildQueueEventsMap } from 'discord-player';
 import type { PlayerMetadata } from '@/player/player-metadata';
 
 /** Infer queue payloads from v8 while retaining this bot's queue metadata. */
