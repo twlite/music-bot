@@ -29,6 +29,12 @@ export function syncStatistics({ guildId }: { guildId: string }) {
   const effects = effectState(queue);
   const channel = client.guilds.cache.get(guildId)?.members.me?.voice.channel;
   const position = syncPosition(guildId);
+  const timestamp = queue?.node.getTimestamp();
+  const value = position.positionMs;
+  const label = (ms: number) => {
+    const sec = Math.max(0, Math.floor(ms / 1000));
+    return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  };
   io.to(guildId).emit('statistics', {
     guildId,
     voiceChannel: channel ? { id: channel.id, name: channel.name } : null,
@@ -36,7 +42,14 @@ export function syncStatistics({ guildId }: { guildId: string }) {
     effectPresets,
     equalizerPreset: effects.equalizerPreset,
     equalizer: effects.equalizer.map((gain, band) => ({ band, gain })),
-    timestamp: queue?.node.getTimestamp() ?? null,
+    playbackRate: position.playbackRate,
+    timestamp: timestamp
+      ? {
+          current: { value, label: label(value) },
+          total: timestamp.total,
+          progress: position.durationMs > 0 ? Math.min(100, Math.round(value / position.durationMs * 100)) : 0,
+        }
+      : null,
     sentAt: Date.now(),
     connected: Boolean(queue?.node.session),
     playing: position.playing,
