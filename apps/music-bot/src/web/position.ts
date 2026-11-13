@@ -45,8 +45,8 @@ export function playbackPosition(queue: GuildQueue | null): PlaybackPosition {
     | undefined;
   const timestamp = queue?.node.getTimestamp();
   const durationMs = Math.max(0, timestamp?.total.value ?? 0);
-  const observed = session?.getMediaTime?.() ?? session?.position.mediaMs ?? timestamp?.current.value ?? 0;
-  const playbackRate = session?.getPlaybackRate?.() ?? tempoFactor(queue?.node.filters.graph);
+  const observed = session?.getMediaTime?.() ?? session?.position?.mediaMs ?? timestamp?.current.value ?? 0;
+  const playbackRate = session?.getPlaybackRate?.() ?? tempoFactor(queue?.node.filters?.graph);
   const positionMs = Math.max(0, Math.min(durationMs || Infinity, observed));
   return {
     trackId: queue?.currentTrack?.id ?? null,
