@@ -1,10 +1,3 @@
-# Music Bot Website
+# Web dashboard
 
-This is the source code for music bot website.
-
-## Built with
-
-- [Next.js](https://nextjs.org/) - React framework
-- [Shadcn UI](https://ui.shadcn.com) - Clean, unstyled UI components
-- [socket.io](https://socket.io/) - Websocket library
-- [tailwindcss](https://tailwindcss.com/) - CSS framework
+The dashboard uses Next.js Pages Router and connects to the bot API over HTTP and Socket.IO. See the [installation guide](../../README.md) and [manual hosting](../../docs/manual-hosting.md) before starting. From the repository root, run `pnpm --filter web dev` for development, or `pnpm build` then `pnpm --filter web start` for production. Open a fresh `/web` link from Discord to sign in.

@@ -5,15 +5,22 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "bot": "pnpm run --filter music-bot"
+    "bot": "pnpm run --filter music-bot",
+    "typecheck": "turbo run typecheck",
+    "test": "pnpm --filter music-bot test"
   },
   "devDependencies": {
-    "eslint": "^8.48.0",
-    "prettier": "^3.0.3",
+    "eslint": "^10.14.0",
+    "prettier": "^3.8.1",
     "tsconfig": "workspace:*",
-    "turbo": "latest",
-    "typescript": "^5.2.2"
+    "turbo": "^2.11.11",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "8.72.2"
   },
-  "packageManager": "pnpm@8.6.10",
-  "name": "music-bot"
+  "packageManager": "pnpm@12.18.0",
+  "name": "music-bot-workspace",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=12 <13"
+  }
 }

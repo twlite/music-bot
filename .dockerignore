@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/.next
+**/dist
+**/.env
+.env*
+**/.env.local
+**/coverage
+.code-review-graph
+
+**/.env*

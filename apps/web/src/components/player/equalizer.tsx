@@ -1,20 +1,20 @@
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   BAND_COUNT,
   EqualizerBand,
   EqualizerConfigurationPreset,
-} from '@/lib/equalizer';
-import { useSocket, useSocketEvent } from '@/context/socket.context';
-import { useEffect, useState } from 'react';
-import { Slider } from '../ui/slider';
-import { Separator } from '../ui/separator';
+} from "@/lib/equalizer";
+import { useSocket, useSocketEvent } from "@/context/socket.context";
+import { useState } from "react";
+import { Slider } from "../ui/slider";
+import { Separator } from "../ui/separator";
 
 type PresetName = keyof typeof EqualizerConfigurationPreset;
 
@@ -29,7 +29,7 @@ function DefaultPresets() {
       onValueChange={(selection) => {
         const preset = EqualizerConfigurationPreset[selection as PresetName];
         if (!preset) return;
-        send('equalizer', preset);
+        send("equalizer", preset);
       }}
     >
       <SelectTrigger className="w-[200px]">
@@ -50,14 +50,14 @@ function DefaultPresets() {
 export function Equalizer({ onClose }: { onClose: () => void }) {
   const { send } = useSocket();
   const [bands, setBands] = useState<EqualizerBand[]>(
-    EqualizerConfigurationPreset.Flat
+    EqualizerConfigurationPreset.Flat,
   );
 
-  useSocketEvent('equalizer', (bands) => {
+  useSocketEvent("equalizer", (bands) => {
     setBands(bands);
   });
 
-  useSocketEvent('statistics', (data) => {
+  useSocketEvent("statistics", (data) => {
     setBands(data.equalizer || EqualizerConfigurationPreset.Flat);
   });
 
@@ -102,7 +102,7 @@ export function Equalizer({ onClose }: { onClose: () => void }) {
                       onValueChange={(e) => {
                         const config = { band: i, gain: e[0] };
                         const newBands = bands.map((b) =>
-                          b.band === i ? config : b
+                          b.band === i ? config : b,
                         );
 
                         setBands(newBands);
@@ -110,10 +110,10 @@ export function Equalizer({ onClose }: { onClose: () => void }) {
                       onValueCommit={(e) => {
                         const config = { band: i, gain: e[0] };
                         const newBands = bands.map((b) =>
-                          b.band === i ? config : b
+                          b.band === i ? config : b,
                         );
 
-                        send('equalizer', newBands);
+                        send("equalizer", newBands);
                       }}
                     />
                     <span className="text-muted-foreground text-sm">
@@ -121,7 +121,7 @@ export function Equalizer({ onClose }: { onClose: () => void }) {
                     </span>
                   </div>
                 );
-              }
+              },
             )}
           </div>
         </div>

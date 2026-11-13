@@ -1,86 +1,105 @@
-import { useSocket, useSocketEvent } from '@/context/socket.context';
-import type { SerializedTrack } from 'music-bot/src/web/types';
-import { useCallback, useState } from 'react';
-import Link from 'next/link';
-import { AlbumCover } from './album-cover';
-import { VolumeController } from './volume-controller';
-import { TimelineActions } from './timeline-actions';
-import { TrackProgress } from './track-progress';
-import { useToast } from '../ui/use-toast';
-import { ActionIcon } from './action-icon';
-import { EqualizerIcon } from './equalizer-icon';
-import { Equalizer } from './equalizer';
-import { cn } from '@/lib/utils';
+import { useSocket, useSocketEvent } from "@/context/socket.context";
+import type { SerializedTrack } from "@music-bot/shared";
+import { useCallback, useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { AlbumCover } from "./album-cover";
+import { VolumeController } from "./volume-controller";
+import { TimelineActions } from "./timeline-actions";
+import { TrackProgress } from "./track-progress";
+import { useToast } from "../ui/use-toast";
+import { ActionIcon } from "./action-icon";
+import { EqualizerIcon } from "./equalizer-icon";
+import { Equalizer } from "./equalizer";
+import { cn } from "@/lib/utils";
 
 export function PlayerController({ showArt = false }) {
+  const clock = useRef({ position: 0, total: 0, received: 0, paused: true });
+  useEffect(() => {
+    const tick = setInterval(() => {
+      const c = clock.current;
+      const position = Math.min(
+        c.total,
+        c.position + (c.paused ? 0 : performance.now() - c.received),
+      );
+      const label = (ms: number) =>
+        `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}`;
+      setProgress(c.total ? (position / c.total) * 100 : 0);
+      setDuration({ current: label(position), total: label(c.total) });
+    }, 250);
+    return () => clearInterval(tick);
+  }, []);
   const { send } = useSocket();
   const [currentTrack, setCurrentTrack] = useState<SerializedTrack | null>(
-    null
+    null,
   );
   const [showEqualizer, setShowEqualizer] = useState(false);
   const [paused, setPaused] = useState(false);
   const [volume, setVolume] = useState(50);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState({
-    current: '0:00',
-    total: '0:00',
+    current: "0:00",
+    total: "0:00",
   });
   const [shuffle, setShuffle] = useState(false);
   const { toast } = useToast();
   const onvolumechange = useCallback(
     (volume: number) => {
-      send('volume', volume);
+      send("volume", volume);
     },
-    [send]
+    [send],
   );
 
-  useSocketEvent('playerStart', (track) => {
+  useSocketEvent("playerStart", (track) => {
     setCurrentTrack(track);
     setPaused(false);
   });
 
-  useSocketEvent('pause', (paused) => {
+  useSocketEvent("pause", (paused) => {
     setPaused(paused);
   });
 
-  useSocketEvent('volume', (volume) => {
+  useSocketEvent("volume", (volume) => {
     setVolume(volume);
   });
 
-  useSocketEvent('statistics', (data) => {
+  useSocketEvent("statistics", (data) => {
+    clock.current = {
+      position: data.timestamp?.current.value ?? 0,
+      total: data.timestamp?.total.value ?? 0,
+      received: performance.now(),
+      paused: data.paused,
+    };
     setPaused(data.paused);
     setVolume(data.volume);
     setProgress(data.timestamp?.progress ?? 0);
     setDuration({
-      current: data.timestamp?.current.label ?? '0:00',
-      total: data.timestamp?.total.label ?? '0:00',
+      current: data.timestamp?.current.label ?? "0:00",
+      total: data.timestamp?.total.label ?? "0:00",
     });
     setCurrentTrack(data.track);
     setShuffle(data.shuffle);
   });
 
-  useSocketEvent('playerFinish', () => {
+  useSocketEvent("playerFinish", () => {
     setCurrentTrack(null);
   });
 
-  useSocketEvent('queued', ({ data, playlist }) => {
+  useSocketEvent("queued", ({ data, playlist }) => {
     toast({
-      title: `${playlist ? 'Playlist' : 'Track'} queued!`,
-      // @ts-expect-error
+      title: `${playlist ? "Playlist" : "Track"} queued!`,
       description: `${data.title} by ${
-        // @ts-expect-error
-        typeof data.author === 'string' ? data.author : data.author.name
+        typeof data.author === "string" ? data.author : data.author.name
       } has been queued successfully!`,
-      variant: 'success',
+      variant: "success",
       duration: 3000,
     });
   });
 
-  useSocketEvent('error', (error) => {
+  useSocketEvent("error", (error) => {
     toast({
-      title: 'Error!',
+      title: "Error!",
       description: error,
-      variant: 'destructive',
+      variant: "destructive",
       duration: 3000,
     });
   });
@@ -93,12 +112,12 @@ export function PlayerController({ showArt = false }) {
         <div className="grid place-items-center h-[80vh]">
           <div className="text-center flex items-center flex-col">
             <AlbumCover
-              icon={currentTrack.thumbnail?.url ?? currentTrack.thumbnail}
+              icon={currentTrack.thumbnail}
               fallback={currentTrack.title}
             />
             <h1 className="text-2xl mt-4">{currentTrack.title}</h1>
             <span className="text-sm text-muted-foreground">
-              {currentTrack?.author ?? 'N/A'}
+              {currentTrack?.author ?? "N/A"}
             </span>
           </div>
         </div>
@@ -106,25 +125,25 @@ export function PlayerController({ showArt = false }) {
       <div className="fixed bottom-0 left-0 px-5 py-3 border-t w-full flex items-center justify-between">
         <div className="flex items-center gap-2">
           <AlbumCover
-            icon={currentTrack?.thumbnail?.url ?? currentTrack?.thumbnail}
+            icon={currentTrack?.thumbnail}
             fallback={currentTrack?.title}
             className="h-12 w-12"
           />
 
           <div className="flex flex-col items-start">
             <Link
-              href={currentTrack?.url || '#'}
-              target={currentTrack ? '_blank' : undefined}
+              href={currentTrack?.url || "#"}
+              target={currentTrack ? "_blank" : undefined}
               className="font-semibold hover:underline"
               title={currentTrack?.title}
             >
               {currentTrack?.title
                 ?.slice(0, 27)
-                .concat(currentTrack.title.length > 27 ? '...' : '') ??
-                'Not Playing'}
+                .concat(currentTrack.title.length > 27 ? "..." : "") ??
+                "Not Playing"}
             </Link>
             <span className="text-xs text-muted-foreground">
-              {currentTrack?.author ?? 'N/A'}
+              {currentTrack?.author ?? "N/A"}
             </span>
           </div>
         </div>
@@ -139,8 +158,8 @@ export function PlayerController({ showArt = false }) {
           >
             <EqualizerIcon
               className={cn(
-                'h-4 w-4 cursor-pointer',
-                showEqualizer ? 'text-destructive' : ''
+                "h-4 w-4 cursor-pointer",
+                showEqualizer ? "text-destructive" : "",
               )}
             />
           </ActionIcon>

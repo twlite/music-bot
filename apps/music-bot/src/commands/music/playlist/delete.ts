@@ -1,10 +1,12 @@
-import { useDatabase } from '#bot/hooks/useDatabase';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
-import type { SlashCommandProps } from 'commandkit';
+import type { ChatInputCommandContext } from "#bot/commands/types";
+import { useDatabase } from "#bot/hooks/useDatabase";
+import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
 
-export async function handleDeletePlaylist({ interaction }: SlashCommandProps) {
+export async function handleDeletePlaylist({
+  interaction,
+}: ChatInputCommandContext) {
   const db = useDatabase();
-  const id = interaction.options.getString('id', true).replace('playlist:', '');
+  const id = interaction.options.getString("id", true).replace("playlist:", "");
 
   await interaction.deferReply({
     ephemeral: true,
@@ -19,7 +21,7 @@ export async function handleDeletePlaylist({ interaction }: SlashCommandProps) {
     return interaction.editReply({
       embeds: [
         EmbedGenerator.Error({
-          title: 'Error',
+          title: "Error",
           description: `You do not have a playlist with id \`playlist:${id}\``,
         }).withAuthor(interaction.user),
       ],
@@ -29,7 +31,7 @@ export async function handleDeletePlaylist({ interaction }: SlashCommandProps) {
   return interaction.editReply({
     embeds: [
       EmbedGenerator.Success({
-        title: 'Success',
+        title: "Success",
         description: `I have successfully deleted the playlist **${playlist.name}**`,
       }).withAuthor(interaction.user),
     ],

@@ -1,5 +1,6 @@
-import { SerializedTrack } from 'discord-player';
-import { Schema, SchemaTypes, model } from 'mongoose';
+import { randomUUID } from "node:crypto";
+import { SerializedTrack } from "discord-player";
+import { Schema, SchemaTypes, model } from "mongoose";
 
 export interface IPlaylistSchema {
   id: string;
@@ -18,7 +19,7 @@ export const PlaylistSchema = new Schema<IPlaylistSchema>(
       type: SchemaTypes.String,
       required: true,
       unique: true,
-      default: () => crypto.randomUUID(),
+      default: () => randomUUID(),
     },
     author: {
       type: SchemaTypes.String,
@@ -27,6 +28,8 @@ export const PlaylistSchema = new Schema<IPlaylistSchema>(
     name: {
       type: SchemaTypes.String,
       required: true,
+      maxlength: 100,
+      trim: true,
     },
     private: {
       type: SchemaTypes.Boolean,
@@ -43,7 +46,10 @@ export const PlaylistSchema = new Schema<IPlaylistSchema>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export const PlaylistModel = model<IPlaylistSchema>('Playlist', PlaylistSchema);
+PlaylistSchema.index({ author: 1, createdAt: -1 });
+PlaylistSchema.index({ private: 1, unlisted: 1 });
+
+export const PlaylistModel = model<IPlaylistSchema>("Playlist", PlaylistSchema);

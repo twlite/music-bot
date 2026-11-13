@@ -1,41 +1,21 @@
-import { useRedis } from '#bot/hooks/useRedis';
-import { useMainPlayer } from 'discord-player';
-import { Interaction } from 'discord.js';
+import { useMainPlayer } from "#bot/player/runtime";
+import { Interaction } from "discord.js";
 
 export default async function interactionCreate(interaction: Interaction) {
-  if (!interaction.isAutocomplete() || interaction.commandName !== 'play')
+  if (!interaction.isAutocomplete() || interaction.commandName !== "play")
     return;
-  const query = interaction.options.getString('query', true);
+  const query = interaction.options.getString("query", true);
 
   if (!query.length) return interaction.respond([]);
 
   try {
-    // autocomplete custom playlists from cache
-    if (query.startsWith('playlist:')) {
-      const redis = useRedis();
-
-      try {
-        const result = await redis.get(`discord-player:custom-${query}`);
-        if (result) {
-          const parsed = JSON.parse(result);
-
-          return interaction.respond([
-            {
-              name: parsed.name.slice(0, 100),
-              value: parsed.url,
-            },
-          ]);
-        }
-      } catch {
-        // fall back to default search
-      }
-    }
-
     const player = useMainPlayer();
 
-    const data = await player.search(query, { requestedBy: interaction.user });
+    const data = await player.search(query, {
+      requestedBy: interaction.user.id,
+    });
 
-    if (!data.hasTracks()) return interaction.respond([]);
+    if (!data.tracks.length) return interaction.respond([]);
 
     const results = data.tracks
       .filter((track) => track.url.length < 100)

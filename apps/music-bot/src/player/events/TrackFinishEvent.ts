@@ -1,30 +1,30 @@
-import { GuildQueue, GuildQueueEvent, Track } from 'discord-player';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
-import { PlayerEvent } from '../common/types.js';
-import { PlayerMetadata } from '../PlayerMetadata.js';
-import { io } from '#bot/web/index';
+import { publicTrack } from "#bot/player/public-media";
+import { GuildQueue, Track } from "discord-player";
+import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
+import { PlayerEvent } from "../common/types.js";
+import { PlayerMetadata } from "../PlayerMetadata.js";
+import { io } from "#bot/web/index";
 
-export default class TrackFinishEvent
-  implements PlayerEvent<typeof GuildQueueEvent.playerFinish>
-{
-  public name = GuildQueueEvent.playerFinish;
+export default class TrackFinishEvent implements PlayerEvent<"playerFinish"> {
+  public name = "playerFinish" as const;
 
   public async execute(
     queue: GuildQueue<PlayerMetadata>,
-    track: Track<unknown>
+    track: Track<unknown>,
   ) {
-    io.to(queue.guild.id).emit('playerFinish', track.serialize());
+    io.to(queue.guildId).emit("playerFinish", publicTrack(track));
 
     const embed = EmbedGenerator.Success({
       description: `[${track.title}](${track.url})`,
-      title: 'Track Finished!',
+      title: "Track Finished!",
       thumbnail: { url: track.thumbnail },
       footer: {
-        text: `Requested by ${track.requestedBy?.tag}`,
-        iconURL: track.requestedBy?.displayAvatarURL(),
+        text: `Requested by ${String(track.requestedBy ?? "unknown")}`,
+        iconURL: undefined,
       },
     });
 
-    queue.metadata.channel.send({ embeds: [embed] });
+    if (queue.metadata.channel.isSendable())
+      await queue.metadata.channel.send({ embeds: [embed] });
   }
 }

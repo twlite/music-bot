@@ -1,6 +1,6 @@
-import { useSocket } from '@/context/socket.context';
-import type { SocketUser } from 'music-bot/src/web/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useSocket } from "@/context/socket.context";
+import type { SocketUser } from "@music-bot/shared";
+import { useCallback, useEffect, useState } from "react";
 
 export function useSession() {
   const [session, setSession] = useState<SocketUser | null>(null);
@@ -8,7 +8,7 @@ export function useSession() {
 
   useEffect(() => {
     try {
-      const data = JSON.parse(sessionStorage.getItem('session')!);
+      const data = JSON.parse(sessionStorage.getItem("session")!);
       setSession(data);
     } catch {
       setSession(null);
@@ -25,7 +25,7 @@ export function useSession() {
 
       setSession(data);
     },
-    [socket]
+    [socket],
   );
 
   return [session, set] as const;

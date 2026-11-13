@@ -1,14 +1,14 @@
-import { useSocket } from '@/context/socket.context';
-import { ActionIcon } from './action-icon';
+import { useSocket } from "@/context/socket.context";
+import { ActionIcon } from "./action-icon";
 import {
   PauseIcon,
   PlayIcon,
   ShuffleIcon,
   TrackNextIcon,
   TrackPreviousIcon,
-} from '@radix-ui/react-icons';
-import { useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
+} from "@radix-ui/react-icons";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function TimelineActions({
   paused,
@@ -33,7 +33,7 @@ export function TimelineActions({
     <div className="flex gap-4">
       <ActionIcon
         onClick={() => {
-          send('back');
+          send("back");
         }}
         name="Previous track"
       >
@@ -44,7 +44,7 @@ export function TimelineActions({
           name="Play"
           onClick={() => {
             setLocalPaused(false);
-            send('pause', false);
+            send("pause", false);
           }}
         >
           <PlayIcon className="h-5 w-5 cursor-pointer" />
@@ -53,7 +53,7 @@ export function TimelineActions({
         <ActionIcon
           onClick={() => {
             setLocalPaused(true);
-            send('pause', true);
+            send("pause", true);
           }}
           name="Pause"
         >
@@ -62,24 +62,24 @@ export function TimelineActions({
       )}
       <ActionIcon
         onClick={() => {
-          send('skip');
+          send("skip");
         }}
         name="Next track"
       >
         <TrackNextIcon className="h-5 w-5 cursor-pointer" />
       </ActionIcon>
       <ActionIcon
-        name={`${shuffleMode ? 'Disable' : 'Enable'} shuffle`}
+        name={`${shuffleMode ? "Disable" : "Enable"} shuffle`}
         onClick={() => {
           const newMode = !shuffleMode;
           setShuffleMode(newMode);
-          send('shuffle', newMode);
+          send("shuffle", newMode);
         }}
       >
         <ShuffleIcon
           className={cn(
-            'h-5 w-5 cursor-pointer',
-            shuffle ? 'text-destructive' : ''
+            "h-5 w-5 cursor-pointer",
+            shuffle ? "text-destructive" : "",
           )}
         />
       </ActionIcon>

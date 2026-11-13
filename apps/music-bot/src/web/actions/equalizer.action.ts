@@ -1,8 +1,11 @@
-import { useQueue } from 'discord-player';
-import { SocketUser } from '../socket.js';
-import type { Socket } from 'socket.io';
-import { PlayerMetadata } from '#bot/player/PlayerMetadata';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { filterGraph } from "#bot/player/effects";
+import { fetchPlayerOptions } from "#bot/player/playerOptions";
+import { useDatabase } from "#bot/hooks/useDatabase";
+import { useQueue } from "#bot/player/runtime";
+import { SocketUser } from "../socket.js";
+import type { Socket } from "socket.io";
+import { PlayerMetadata } from "#bot/player/PlayerMetadata";
+import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
 
 export type EqualizerBand = {
   band: number;
@@ -12,26 +15,29 @@ export type EqualizerBand = {
 export async function EqualizerAction(
   info: SocketUser,
   socket: Socket,
-  eq: EqualizerBand[]
+  eq: EqualizerBand[],
 ) {
   const queue = useQueue<PlayerMetadata>(info.guildId);
-  if (!queue?.connection) return socket.disconnect(true);
+  if (!queue?.node.session) return socket.disconnect(true);
 
-  if (
-    !queue.filters.equalizer ||
-    !eq.length ||
-    eq.some((e) => isNaN(e.band) || isNaN(e.gain))
-  )
-    return;
-
-  queue.filters.equalizer.setEQ(eq);
-
-  await queue.metadata.channel.send({
-    embeds: [
-      EmbedGenerator.Success({
-        title: 'Equalizer updated!',
-        description: `The equalizer was updated by ${info.displayName} (<@${info.id}>).`,
-      }),
-    ],
-  });
+  const settings = await fetchPlayerOptions(info.guildId);
+  const gains = Array.from(
+    { length: 15 },
+    (_, i) => eq.find((e) => e.band === i)?.gain ?? settings.equalizer[i],
+  );
+  await queue.filters.setRaw(filterGraph(gains, settings.filters));
+  await useDatabase().guild.updateOne(
+    { id: info.guildId },
+    { $set: { equalizer: gains } },
+    { runValidators: true },
+  );
+  if (queue.metadata.channel.isSendable())
+    await queue.metadata.channel.send({
+      embeds: [
+        EmbedGenerator.Success({
+          title: "Equalizer updated!",
+          description: `The equalizer was updated by ${info.displayName} (<@${info.id}>).`,
+        }),
+      ],
+    });
 }

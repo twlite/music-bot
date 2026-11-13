@@ -1,6 +1,6 @@
-import { EmbedBuilder, UserResolvable } from 'discord.js';
-import { EmbedColor } from './constants.js';
-import { useClient } from '#bot/hooks/useClient';
+import { EmbedBuilder, UserResolvable } from "discord.js";
+import { EmbedColor } from "./constants.js";
+import { useClient } from "#bot/hooks/useClient";
 
 type EmbedInit = ConstructorParameters<typeof EmbedBuilder>[0];
 
@@ -23,7 +23,10 @@ export class EmbedGenerator extends EmbedBuilder {
 
   public static create(data?: EmbedInit) {
     const client = useClient();
-    return new EmbedGenerator(data).setClient(client);
+    const safe = data ? { ...data } : undefined;
+    if (safe?.thumbnail && !safe.thumbnail.url) delete safe.thumbnail;
+    if (safe?.image && !safe.image.url) delete safe.image;
+    return new EmbedGenerator(safe).setClient(client);
   }
 
   public client: ReturnType<typeof useClient> | null = null;

@@ -1,16 +1,19 @@
-import { PlayerMetadata } from '#bot/player/PlayerMetadata';
-import { fetchPlayerOptions } from '#bot/player/playerOptions';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
-import type { CommandData, SlashCommandProps } from 'commandkit';
-import { QueueRepeatMode, useMainPlayer } from 'discord-player';
-import { ApplicationCommandOptionType } from 'discord.js';
+import type { ChatInputCommandContext } from "#bot/commands/types";
+import { queueDefaults } from "#bot/player/effects";
+import { PlayerMetadata } from "#bot/player/PlayerMetadata";
+import { fetchPlayerOptions } from "#bot/player/playerOptions";
+import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
+import type { CommandData } from "commandkit";
+
+import { useMainPlayer } from "#bot/player/runtime";
+import { ApplicationCommandOptionType } from "discord.js";
 
 export const data: CommandData = {
-  name: 'play',
-  description: 'Play a song',
+  name: "play",
+  description: "Play a song",
   options: [
     {
-      name: 'query',
+      name: "query",
       description:
         'The track or playlist to play. Custom playlist id must be prefixed with "playlist:"',
       type: ApplicationCommandOptionType.String,
@@ -20,21 +23,21 @@ export const data: CommandData = {
   ],
 };
 
-export async function run({ interaction }: SlashCommandProps) {
+export async function run({ interaction }: ChatInputCommandContext) {
   if (!interaction.inCachedGuild()) return;
   const player = useMainPlayer();
   const channel = interaction.member.voice.channel!;
-  const query = interaction.options.getString('query', true);
+  const query = interaction.options.getString("query", true);
 
   await interaction.deferReply();
 
   const result = await player.search(query, {
-    requestedBy: interaction.user,
+    requestedBy: interaction.user.id,
   });
 
-  if (!result.hasTracks()) {
+  if (!result.tracks.length) {
     const embed = EmbedGenerator.Error({
-      title: 'No results found',
+      title: "No results found",
       description: `No results found for \`${query}\``,
     }).withAuthor(interaction.user);
 
@@ -44,40 +47,21 @@ export async function run({ interaction }: SlashCommandProps) {
   try {
     const playerOptions = await fetchPlayerOptions(interaction.guildId);
 
-    const { track, searchResult } = await player.play(channel, result, {
+    const { searchResult } = await player.play(channel, result, {
       nodeOptions: {
         metadata: PlayerMetadata.create(interaction),
-        volume: playerOptions.volume,
-        repeatMode: QueueRepeatMode[
-          playerOptions.loopMode
-        ] as unknown as QueueRepeatMode,
-        a_filter: playerOptions.filters as ('8D' | 'Tremolo' | 'Vibrato')[],
-        equalizer: playerOptions.equalizer.map((eq, i) => ({
-          band: i,
-          gain: eq,
-        })),
-        noEmitInsert: true,
-        leaveOnStop: false,
-        leaveOnEmpty: true,
-        leaveOnEmptyCooldown: 60000,
-        leaveOnEnd: true,
-        leaveOnEndCooldown: 60000,
-        pauseOnEmpty: true,
-        preferBridgedMetadata: true,
-        disableBiquad: true,
+        ...queueDefaults(playerOptions),
       },
-      requestedBy: interaction.user,
-      connectionOptions: {
-        deaf: true,
-      },
+      requestedBy: interaction.user.id,
+      selfDeaf: true,
     });
 
     const embed = EmbedGenerator.Info({
-      title: `${searchResult.hasPlaylist() ? 'Playlist' : 'Track'} queued!`,
-      thumbnail: { url: track.thumbnail },
-      description: `[${track.title}](${track.url})`,
+      title: `${Boolean(searchResult.playlist) ? "Playlist" : "Track"} queued!`,
+      thumbnail: { url: searchResult.tracks[0].thumbnail },
+      description: `[${searchResult.tracks[0].title}](${searchResult.tracks[0].url})`,
       fields: searchResult.playlist
-        ? [{ name: 'Playlist', value: searchResult.playlist.title }]
+        ? [{ name: "Playlist", value: searchResult.playlist.title }]
         : [],
     }).withAuthor(interaction.user);
 
@@ -86,7 +70,7 @@ export async function run({ interaction }: SlashCommandProps) {
     console.error(e);
 
     const embed = EmbedGenerator.Error({
-      title: 'Something went wrong',
+      title: "Something went wrong",
       description: `Something went wrong while playing \`${query}\``,
     }).withAuthor(interaction.user);
 

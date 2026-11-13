@@ -1,14 +1,17 @@
-import loadCustomPlaylistsCache from '#bot/events/ready/loadCustomPlaylists';
-import { useDatabase } from '#bot/hooks/useDatabase';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
-import type { SlashCommandProps } from 'commandkit';
-import { serialize, useQueue } from 'discord-player';
+import type { ChatInputCommandContext } from "#bot/commands/types";
+import { useDatabase } from "#bot/hooks/useDatabase";
+import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
 
-export async function handleCreatePlaylist({ interaction }: SlashCommandProps) {
+import { serialize } from "discord-player";
+import { useQueue } from "#bot/player/runtime";
+
+export async function handleCreatePlaylist({
+  interaction,
+}: ChatInputCommandContext) {
   const db = useDatabase();
-  const name = interaction.options.getString('name', true);
-  const isPrivate = !!interaction.options.getBoolean('private', false);
-  const isUnlisted = !!interaction.options.getBoolean('unlisted', false);
+  const name = interaction.options.getString("name", true);
+  const isPrivate = !!interaction.options.getBoolean("private", false);
+  const isUnlisted = !!interaction.options.getBoolean("unlisted", false);
 
   await interaction.deferReply({
     ephemeral: isPrivate,
@@ -18,17 +21,17 @@ export async function handleCreatePlaylist({ interaction }: SlashCommandProps) {
 
   if (!queue) {
     const embed = EmbedGenerator.Error({
-      title: 'Not playing',
-      description: 'I am not playing anything right now',
+      title: "Not playing",
+      description: "I am not playing anything right now",
     }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
   }
 
-  if (queue.isEmpty()) {
+  if (!queue.currentTrack && queue.isEmpty()) {
     const embed = EmbedGenerator.Error({
-      title: 'Error',
-      description: 'You cannot export an empty queue',
+      title: "Error",
+      description: "You cannot export an empty queue",
     }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
@@ -40,16 +43,16 @@ export async function handleCreatePlaylist({ interaction }: SlashCommandProps) {
 
   if (playlistsCount >= 50) {
     const embed = EmbedGenerator.Error({
-      title: 'Error',
-      description: 'You cannot create more than 50 playlists.',
+      title: "Error",
+      description: "You cannot create more than 50 playlists.",
     }).withAuthor(interaction.user);
 
     return interaction.editReply({ embeds: [embed] });
   }
 
-  const tracks = [queue.currentTrack, ...queue.tracks.store]
+  const tracks = [queue.currentTrack, ...queue.tracks.toArray()]
     .filter(Boolean)
-    .map((track) => serialize(track));
+    .map((track) => serialize(track!));
 
   const playlist = await db.playlist.create({
     name,
@@ -59,10 +62,8 @@ export async function handleCreatePlaylist({ interaction }: SlashCommandProps) {
     tracks,
   });
 
-  await loadCustomPlaylistsCache(interaction.client).catch(() => {});
-
   const embed = EmbedGenerator.Success({
-    title: 'Playlist created',
+    title: "Playlist created",
     description: `I have successfully created the playlist \`${playlist.name}\` (\`playlist:${playlist.id}\`) with ${tracks.length} tracks. You can play it using \`/play\` command.`,
   }).withAuthor(interaction.user);
 

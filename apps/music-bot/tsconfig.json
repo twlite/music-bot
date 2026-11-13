@@ -12,10 +12,13 @@
     "sourceMap": false,
     "declaration": false,
     "rootDir": "src",
-    "baseUrl": ".",
     "paths": {
-      "#bot/*": ["src/*.js"]
+      "#bot/*": [
+        "./src/*.ts"
+      ]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

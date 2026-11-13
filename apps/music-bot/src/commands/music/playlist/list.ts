@@ -1,13 +1,15 @@
-import { useDatabase } from '#bot/hooks/useDatabase';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
-import type { SlashCommandProps } from 'commandkit';
+import type { ChatInputCommandContext } from "#bot/commands/types";
+import { useDatabase } from "#bot/hooks/useDatabase";
+import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
 
 const ITEMS_PER_PAGE = 10 as const;
 
-export async function handleListPlaylists({ interaction }: SlashCommandProps) {
+export async function handleListPlaylists({
+  interaction,
+}: ChatInputCommandContext) {
   await interaction.deferReply({ ephemeral: true });
   const db = useDatabase();
-  const page = interaction.options.getInteger('limit', false) ?? 0;
+  const page = interaction.options.getInteger("page", false) ?? 0;
 
   const playlists = await db.playlist
     .find({
@@ -22,22 +24,22 @@ export async function handleListPlaylists({ interaction }: SlashCommandProps) {
         EmbedGenerator.Error({
           description:
             page === 0
-              ? 'You have no saved playlists.'
+              ? "You have no saved playlists."
               : `No items found for page ${page + 1}!`,
-          title: 'Error!',
+          title: "Error!",
         }).withAuthor(interaction.user),
       ],
     });
   }
 
   const embed = EmbedGenerator.Success({
-    title: 'Your custom playlists',
+    title: "Your custom playlists",
     description: playlists
       .map(
         (playlist, idx) =>
-          `${++idx}. **${playlist.name}** - \`playlist:${playlist.id}\``
+          `${++idx}. **${playlist.name}** - \`playlist:${playlist.id}\``,
       )
-      .join('\n'),
+      .join("\n"),
     footer: {
       text: `You have total ${playlists.length}/50 playlists.`,
     },

@@ -1,12 +1,6 @@
-import { GuildQueueEvents } from 'discord-player';
-import { PlayerMetadata } from '../PlayerMetadata.js';
-
-export interface PlayerEvent<
-  K extends keyof GuildQueueEvents,
-  M = PlayerMetadata,
-> {
-  name: K;
-  execute: GuildQueueEvents<M>[K];
-}
-
+import type { GuildQueueEventsMap } from "discord-player";
 export type Constructable<T> = new (...args: any[]) => T;
+export interface PlayerEvent<T extends keyof GuildQueueEventsMap> {
+  name: T;
+  execute(...args: GuildQueueEventsMap[T]): unknown;
+}
