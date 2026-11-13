@@ -24,7 +24,7 @@
     "test:remote": "node scripts/remote-smoke.mjs"
   },
   "dependencies": {
-    "@discord-player/plugin-host": "8.0.0-dev.5",
+    "@discord-player/plugin-host": "8.0.0-dev.6",
     "@music-bot/shared": "workspace:*",
     "@remedia/client": "0.2.1",
     "@remedia/node": "0.2.1",
@@ -32,7 +32,7 @@
     "commandkit": "^1.2.6",
     "commandkit-plugin-discord-player": "1.0.0",
     "cors": "^2.8.6",
-    "discord-player": "8.0.0-dev.5",
+    "discord-player": "8.0.0-dev.6",
     "discord.js": "14.28.1",
     "dotenv": "18.0.10",
     "express": "^5.3.0",

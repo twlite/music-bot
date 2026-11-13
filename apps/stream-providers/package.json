@@ -14,8 +14,8 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@discord-player/plugin-host": "8.0.0-dev.5",
-    "discord-player": "8.0.0-dev.5",
+    "@discord-player/plugin-host": "8.0.0-dev.6",
+    "discord-player": "8.0.0-dev.6",
     "discord-player-applemusic": "1.0.3",
     "discord-player-soundcloud": "1.0.7",
     "discord-player-spotify": "1.1.9",
