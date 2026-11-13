@@ -4,7 +4,7 @@
   "users": [
     {
       "username": "media-bot",
-      "password": "env('REMEDIA_RPC_PASSWORD')"
+      "password": "env('REMEDIA_PASSWORD')"
     }
   ],
   "media": {
