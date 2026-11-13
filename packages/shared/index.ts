@@ -42,6 +42,7 @@ export const QueueRepeatMode = {
 } as const;
 export interface IStatistics {
   guildId: string;
+  playbackRate: number | null;
   voiceChannel: { id: string; name: string } | null;
   timestamp: {
     current: { label: string; value: number };
@@ -106,6 +107,8 @@ export type PlaybackPosition = {
   trackId: string | null;
   positionMs: number;
   durationMs: number;
+  /** Source-media milliseconds per wall-clock millisecond; null when unknown. */
+  playbackRate: number | null;
   playing: boolean;
   paused: boolean;
   sentAt: number;

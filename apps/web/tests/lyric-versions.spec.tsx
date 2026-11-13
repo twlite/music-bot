@@ -87,6 +87,7 @@ beforeEach(() => {
     track,
     connected: true,
     playing: true,
+    playbackRate: 1,
     paused: false,
     timestamp: { current: { label: '0:05', value: 5000 }, total: { label: '3:00', value: 180000 }, progress: 3 },
     sentAt: 1,

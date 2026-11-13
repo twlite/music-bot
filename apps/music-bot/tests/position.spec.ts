@@ -23,6 +23,28 @@ it('uses audible playback time when the source media position is far ahead', () 
   expect(getTimestamp).toHaveBeenCalledExactlyOnceWith();
 });
 
+it('prefers Remedia client source estimation and preserves the filter playback rate', () => {
+  const queue = {
+    currentTrack: { id: 'track' },
+    node: {
+      getTimestamp: () => ({ current: { value: 5000 }, total: { value: 100000 } }),
+      isPaused: () => false,
+      filters: { graph: 'aresample=48000,asetrate=48000*1.25' },
+      session: {
+        state: 'playing',
+        position: { mediaMs: 5000 },
+        getMediaTime: () => 12500,
+        getPlaybackRate: () => 1.25,
+      },
+    },
+  } as unknown as GuildQueue;
+  expect(playbackPosition(queue)).toMatchObject({
+    positionMs: 12500,
+    playbackRate: 1.25,
+    durationMs: 100000,
+  });
+});
+
 it('does not advance a paused or buffering session', () => {
   const queue = {
     currentTrack: { id: 'track' },
