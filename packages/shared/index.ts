@@ -42,6 +42,7 @@ export const QueueRepeatMode = {
 } as const;
 export interface IStatistics {
   guildId: string;
+  playbackRate: number | null;
   voiceChannel: { id: string; name: string } | null;
   timestamp: {
     current: { label: string; value: number };
