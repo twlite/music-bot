@@ -28,6 +28,7 @@ const packet: PlaybackPosition = {
   trackId: 'track',
   positionMs: 5000,
   durationMs: 230000,
+  playbackRate: 1,
   playing: true,
   paused: false,
   sentAt: 2000,
