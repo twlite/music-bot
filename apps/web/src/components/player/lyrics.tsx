@@ -38,7 +38,12 @@ export function Lyrics({
     requestedTrack.current = track.id;
     setLyrics(null);
     setFollow(true);
-    send('lyrics', { trackId: track.id, query: search, resultIndex, requestId: activeRequest.current });
+    send('lyrics', {
+      trackId: track.id,
+      query: search,
+      ...(resultIndex === undefined ? {} : { resultIndex }),
+      requestId: activeRequest.current,
+    });
   };
 
   useEffect(() => {
