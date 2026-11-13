@@ -63,7 +63,7 @@ export function Lyrics({
 
   const search = (event: FormEvent) => {
     event.preventDefault();
-    if (query.trim()) request(query.trim(), 0);
+    if (query.trim()) request(query.trim());
   };
 
   useEffect(() => {

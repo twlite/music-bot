@@ -161,7 +161,8 @@ it('supports manual lyric searches and ignores a late automatic response', () =>
   fireEvent.change(screen.getByRole('textbox', { name: 'Search lyrics' }), { target: { value: 'Better song artist' } });
   fireEvent.submit(screen.getByRole('textbox', { name: 'Search lyrics' }).closest('form')!);
   const manual = send.mock.calls.at(-1)![1];
-  expect(manual).toMatchObject({ trackId: track.id, query: 'Better song artist', resultIndex: 0 });
+  expect(manual).toMatchObject({ trackId: track.id, query: 'Better song artist' });
+  expect(manual).not.toHaveProperty('resultIndex');
   act(() =>
     events.get('lyrics')!({
       trackId: track.id,
