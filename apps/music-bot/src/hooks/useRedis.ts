@@ -1,5 +1,5 @@
-import { HooksRegistry, Symbols } from './registry.js';
-import type { Redis } from 'ioredis';
+import { HooksRegistry, Symbols } from "./registry.js";
+import type { Redis } from "ioredis";
 
 export function useRedisAsync() {
   return new Promise<Redis>((resolve) => {
@@ -19,7 +19,7 @@ export function useRedis() {
   const redis = HooksRegistry.get(Symbols.kRedis) as Redis | undefined;
 
   if (!redis) {
-    throw new Error('Redis has not been initialized');
+    throw new Error("Redis has not been initialized");
   }
 
   return redis;

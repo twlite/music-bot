@@ -5,16 +5,16 @@
     "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
-    "module": "NodeNext",
+    "module": "ESNext",
     "target": "ESNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Bundler",
     "declarationMap": false,
     "sourceMap": false,
     "declaration": false,
     "rootDir": "src",
     "paths": {
-      "#bot/*": [
-        "./src/*.ts"
+      "@/*": [
+        "./src/*"
       ]
     }
   },

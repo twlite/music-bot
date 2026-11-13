@@ -1,3 +1,7 @@
-export default function logReady(client: { user: { tag: string } }) {
-  console.log(`Logged in as ${client.user.tag}`);
-}
+import type { EventHandler } from "commandkit";
+
+const handler: EventHandler<"clientReady"> = (client) => {
+  console.log(`🤖 ${client.user.displayName} is online!`);
+};
+
+export default handler;

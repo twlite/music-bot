@@ -1,21 +1,16 @@
+import { config } from "@/config";
 import { DiscordPlayer, type GuildQueue } from "discord-player";
-import { client } from "#bot/bootstrap/client";
-import { catalogues } from "./catalogues.js";
-import { mediaProviders } from "./providers.js";
+import { client } from "@/bootstrap/client";
 import { directMedia } from "./direct-media.js";
 import { customPlaylists } from "./custom-playlists.js";
 import { createRemediaNodes } from "./config.js";
 
 export const player = new DiscordPlayer({
-  nodes: createRemediaNodes(),
-  crossfade:
-    process.env.CROSSFADE_ENABLED === "true"
-      ? {
-          enabled: true,
-          durationMs: Number(process.env.CROSSFADE_DURATION_MS ?? 5000),
-        }
-      : false,
-  plugins: [customPlaylists(), mediaProviders(), catalogues(), directMedia()],
+  nodes: await createRemediaNodes(),
+  crossfade: config.crossfade.enabled
+    ? { enabled: true, durationMs: config.crossfade.durationMs }
+    : false,
+  plugins: [customPlaylists(), directMedia()],
   send(guildId, payload) {
     const guild = client.guilds.cache.get(guildId);
     if (!guild) throw new Error("Voice guild is unavailable");
@@ -30,7 +25,6 @@ export const player = new DiscordPlayer({
       : null;
   },
 });
-client.on("raw", (packet) => player.receive(packet));
 export const useMainPlayer = () => player;
 export const useQueue = <T = unknown>(guildId: string) =>
   player.nodes.get(guildId) as GuildQueue<T> | undefined;
@@ -52,8 +46,13 @@ export const useTimeline = (guildId: string) => {
 
 /** Register independently deployed Remedia-compatible source hosts. */
 export async function registerSourceHosts() {
-  const hosts = JSON.parse(process.env.SOURCE_PLUGIN_HOSTS ?? "[]");
-  if (!Array.isArray(hosts))
-    throw new Error("SOURCE_PLUGIN_HOSTS must be a JSON array");
-  for (const host of hosts) await player.plugins.registerHost(host);
+  for (const host of config.sourcePluginHosts) {
+    await player.plugins.registerHost({
+      hostId: host.hostId,
+      url: host.url,
+      token: host.tokenEnvironmentVariable
+        ? process.env[host.tokenEnvironmentVariable]
+        : undefined,
+    });
+  }
 }

@@ -1,10 +1,10 @@
+import { config } from "@/config";
 import { definePlugin, Track } from "discord-player";
 
 /** Limit direct native URL access to explicitly trusted media hosts. */
 export function mediaURL(
   query: string,
-  hosts = process.env.MEDIA_ALLOWED_HOSTS ??
-    "cdn.discordapp.com,media.discordapp.net",
+  hosts: readonly string[] = config.mediaAllowedHosts,
 ) {
   try {
     const url = new URL(query);
@@ -15,13 +15,7 @@ export function mediaURL(
       (url.port && url.port !== "443")
     )
       return null;
-    if (
-      !hosts
-        .split(",")
-        .map((s) => s.trim())
-        .includes(url.hostname)
-    )
-      return null;
+    if (!hosts.includes(url.hostname)) return null;
     return url;
   } catch {
     return null;
@@ -59,7 +53,7 @@ export const directMedia = definePlugin({
       const url = mediaURL(track.url);
       if (!url)
         throw new Error(
-          "Media host is not allowed. Set MEDIA_ALLOWED_HOSTS for trusted providers.",
+          "Media host is not allowed. Update mediaAllowedHosts in app.config.json for trusted providers.",
         );
       return { url: url.href };
     });

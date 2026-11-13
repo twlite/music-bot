@@ -2,13 +2,14 @@
 
 Run the bot/API and dashboard as separate processes. Nothing requires Docker service names or container paths.
 
-## Node and pnpm
+## Node, pnpm and Bun
 
 Install Node.js 24 from nodejs.org (Windows/macOS installers or a Linux Node distribution). Verify `node --version` starts with `v24`. Install pnpm:
 
 ```sh
-npm install --global pnpm@12.18.0
+npm install --global pnpm@12.18.0 bun@1.4.4
 pnpm --version
+bun --version
 pnpm install --frozen-lockfile
 ```
 
@@ -27,7 +28,7 @@ brew services start mongodb-community@8.0
 brew services start redis
 ```
 
-On Windows use MongoDB's Windows service installer and an external Redis server, WSL Redis or a Redis-compatible service such as Memurai. Bind local databases to loopback; use firewall rules, authentication and TLS for external deployments. The bot accepts `REDIS_HOST`, `REDIS_PORT` and `REDIS_PASSWORD`. For TLS, use a private tunnel to Redis or extend the Redis connection configuration; the current environment contract does not enable Redis TLS itself.
+On Windows use MongoDB's Windows service installer and an external Redis server, WSL Redis or a Redis-compatible service such as Memurai. Bind local databases to loopback; use firewall rules, authentication and TLS for external deployments. Set `redis.host` and `redis.port` in `app.config.json`, and `REDIS_PASSWORD` in `.env`. For TLS, use a private tunnel to Redis or extend the Redis connection configuration; the current environment contract does not enable Redis TLS itself.
 
 ## FFmpeg 9 for embedded playback
 
@@ -53,29 +54,59 @@ The runtime is installed under the current user's `.remedia/ffmpeg9` directory a
 
 Verify with `pnpm --filter music-bot exec node scripts/native-smoke.mjs`. Linux native/server binaries require modern glibc; Ubuntu 24.04 or Debian 13 is recommended. Remote playback avoids loading native libraries in the bot and is useful on hosts without compatible native builds.
 
-## Environment files
+## Bot configuration and secrets
 
-Copy `apps/music-bot/.env.example` to `apps/music-bot/.env`:
+Edit `apps/music-bot/app.config.json` for manual hosting. Docker instead mounts `docker/app.config.json` at the same runtime filename. These files contain non-sensitive settings:
 
-| Variable                | Value and purpose                                                                        |
-| ----------------------- | ---------------------------------------------------------------------------------------- |
-| `DISCORD_TOKEN`         | Bot token from Developer Portal → application → Bot                                      |
-| `DATABASE_URL`          | MongoDB connection URI, including database name                                          |
-| `REDIS_HOST`            | Redis hostname, default example `127.0.0.1`                                              |
-| `REDIS_PORT`            | Redis TCP port, usually `6379`                                                           |
-| `REDIS_PASSWORD`        | Redis password; empty only for an unprotected local service                              |
-| `PORT`                  | Bot HTTP/Socket.IO port, `5000`                                                          |
-| `WEB_INTERFACE_URL`     | Exact dashboard origin, `http://localhost:3000` locally                                  |
-| `REMEDIA_MODE`          | `embedded` (default) or `remote`                                                         |
-| `REMEDIA_URL`           | Remote WebSocket URL, `ws://127.0.0.1:8787`; use `wss://` across public networks         |
-| `REMEDIA_USERNAME`      | Account configured in the remote server, example `media-bot`                             |
-| `REMEDIA_PASSWORD`      | Password for that account; choose your own                                               |
-| `CROSSFADE_ENABLED`     | `false` by default; `true` enables crossfade for new sessions                            |
-| `CROSSFADE_DURATION_MS` | Overlap duration, `1000`–`30000`, example `5000`                                         |
-| `MEDIA_ALLOWED_HOSTS`   | Exact trusted hostnames for direct HTTPS media, separated by commas                      |
-| `SOCKET_REDIS_ADAPTER`  | `false` for a single process; `true` enables Socket.IO fanout only                       |
-| `SOURCE_PLUGIN_HOSTS`   | JSON array of trusted source host descriptors, default `[]`                              |
-| `SOUNDCLOUD_CLIENT_ID`  | Optional SoundCloud client ID for the provider library; set if automatic discovery fails |
+```json
+{
+  "http": {
+    "port": 5000,
+    "dashboardUrl": "http://localhost:3000"
+  },
+  "database": {
+    "url": "mongodb://127.0.0.1:27017/music-bot"
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "socketAdapter": false
+  },
+  "remedia": {
+    "mode": "embedded",
+    "url": "remedia://127.0.0.1:8787",
+    "username": "media-bot"
+  },
+  "crossfade": {
+    "enabled": false,
+    "durationMs": 5000
+  },
+  "mediaAllowedHosts": ["cdn.discordapp.com", "media.discordapp.net"],
+  "sourcePluginHosts": [
+    {
+      "hostId": "stream-providers",
+      "url": "http://localhost:5678",
+      "tokenEnvironmentVariable": "STREAM_PROVIDERS_TOKEN"
+    }
+  ]
+}
+```
+
+`http.dashboardUrl` is the exact dashboard origin, without a trailing slash or path, and controls CORS and `/web` links. `http.port` is the bot API port. `database.url` is an unauthenticated MongoDB address; use the secret override below for credential-bearing URIs. `redis.host` and `redis.port` locate Redis; `redis.socketAdapter` enables Socket.IO fanout when needed. `remedia.mode` is `embedded` or `remote` for manual hosting; `compose` is reserved for Docker's automatic profile selection. `remedia.url` and `remedia.username` identify the remote server and account. `crossfade.enabled` defaults to false; `durationMs` must be between 1000 and 30000. `mediaAllowedHosts` lists exact trusted HTTPS media hosts. `sourcePluginHosts` connects the bot to the included Bun source host, described in [source-host setup](stream-providers.md).
+
+Copy `apps/music-bot/.env.example` to `apps/music-bot/.env` and fill only secrets:
+
+| Variable                 | Purpose                                                                                      |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| `DISCORD_TOKEN`          | Developer Portal → application → Bot token                                                   |
+| `DATABASE_URL`           | Optional credential-bearing MongoDB URI; overrides `database.url` when nonempty              |
+| `REDIS_PASSWORD`         | Redis password; empty for a private local instance without authentication                    |
+| `REMEDIA_PASSWORD`       | Password for the account named in `remedia.username`                                         |
+| `STREAM_PROVIDERS_TOKEN` | Required shared bearer secret for the included source host; use the same value in its `.env` |
+
+Keep passwords and tokens out of `app.config.json`. Restart the bot after changing configuration. Run it with `apps/music-bot` as its working directory; deployed Docker images use `/app` with their own mounted config. The build preserves this external configuration rather than baking it into JavaScript.
+
+Copy `apps/stream-providers/.env.example` to `apps/stream-providers/.env`. Generate a secret with `openssl rand -hex 32` and put it in both the source host and bot environments as `STREAM_PROVIDERS_TOKEN`. The source host runs directly on Bun; [source-host setup](stream-providers.md) explains its configuration.
 
 Copy `apps/web/.env.example` to `apps/web/.env.local`. Set **both** `NEXT_PUBLIC_GATEWAY_URL` and `NEXT_PUBLIC_BACKEND_URL` to the browser-accessible bot/API origin, e.g. `http://localhost:5000`. These public values are included in the build; never place secrets in `NEXT_PUBLIC_*`. Rebuild when changing them.
 
@@ -98,45 +129,69 @@ export REMEDIA_RPC_PASSWORD='your-long-random-password'
 remedia serve --config ./remedia.config.json
 ```
 
-PowerShell uses `$env:REMEDIA_RPC_PASSWORD = 'your-long-random-password'`. In the bot `.env`, set `REMEDIA_MODE=remote`, `REMEDIA_URL=ws://127.0.0.1:8787`, `REMEDIA_USERNAME=media-bot` and the same password. The client supplies the Discord bot identity after Gateway READY and manages reconnect/session recovery. The remote server must reach Discord voice and every selected media URL. Sources are resolved near the bot; IP-bound provider URLs may need a source host near Remedia instead.
+PowerShell uses `$env:REMEDIA_RPC_PASSWORD = 'your-long-random-password'`. In the bot `app.config.json`, set `remedia.mode` to `remote`, `remedia.url` to `remedia://127.0.0.1:8787`, and `remedia.username` to `media-bot`. Put the same password in the bot `.env` as `REMEDIA_PASSWORD`. The client supplies the Discord bot identity after Gateway READY and manages reconnect/session recovery. The remote server must reach Discord voice and every selected media URL. Sources are resolved near the bot; IP-bound provider URLs may need a source host near Remedia instead.
 
 The server's media/network policies must permit the chosen providers. Add `"audio": {"crossfade": {"enabled": true}}` to the server configuration to permit client-requested crossfade (the bot still defaults to disabled); unsupported nodes fall back to normal queue playback. Recreate sessions after changing crossfade settings.
 
-Trusted source hosts can be registered using:
-
-```dotenv
-SOURCE_PLUGIN_HOSTS=[{"hostId":"providers","url":"https://sources.example.com","token":"replace-with-host-bearer-token"}]
-```
-
-Use the same host identity in the remote server's plugin-host configuration. The server must advertise that host and its stream operation. Credentials belong in environment/configuration, never in saved Tracks. This setting connects an existing compatible host; it does not install one.
+For the included source host, add the `pluginHosts` block from [source-host setup](stream-providers.md#remote-remedia) to the server config and set `STREAM_PROVIDERS_TOKEN` in the server environment. Keep the host identity and token identical in the bot, source host and remote server. The source host must be reachable by both the bot and Remedia.
 
 ## Build and run
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm build
+pnpm --filter stream-providers start
+```
+
+After the provider server logs that it is listening, start the bot in another terminal:
+
+```sh
 pnpm --filter music-bot start
 ```
 
-In another terminal:
+Start the dashboard in a third terminal:
 
 ```sh
 pnpm --filter web start
 ```
 
-Use `PORT=3001 pnpm --filter web start` on Unix to change the dashboard port; update `WEB_INTERFACE_URL` accordingly. On Windows set `$env:PORT='3001'` before running the command.
+Use `PORT=3001 pnpm --filter web start` on Unix to change the dashboard port; update `http.dashboardUrl` in the bot config accordingly. On Windows set `$env:PORT='3001'` before running the command.
 
 ## Linux systemd
 
 Create a dedicated `musicbot` user and install the repository in `/srv/music-bot`, owned by that user. Install FFmpeg as that user or set the explicit library path. Build before starting the services. Put secrets in `/etc/music-bot/bot.env`, mode `0600`, readable by root. Use absolute binary paths from `command -v node` and `command -v pnpm` if yours differ.
+
+`/etc/systemd/system/music-stream-providers.service` (put the shared token in `/etc/music-bot/providers.env`, mode `0600`; adjust the Bun path from `command -v bun`):
+
+```ini
+[Unit]
+Description=Music source providers
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=musicbot
+WorkingDirectory=/srv/music-bot/apps/stream-providers
+EnvironmentFile=/etc/music-bot/providers.env
+Environment=NODE_ENV=production
+ExecStart=/usr/local/bin/bun src/index.ts
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=20
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+```
 
 `/etc/systemd/system/music-bot.service`:
 
 ```ini
 [Unit]
 Description=Discord music bot and API
-After=network-online.target
-Wants=network-online.target
+After=network-online.target music-stream-providers.service
+Wants=network-online.target music-stream-providers.service
 
 [Service]
 User=musicbot
@@ -179,9 +234,9 @@ WantedBy=multi-user.target
 
 ```sh
 sudo systemctl daemon-reload
-sudo systemctl enable --now music-bot music-dashboard
+sudo systemctl enable --now music-stream-providers music-bot music-dashboard
 journalctl -u music-bot -f
-sudo systemctl restart music-bot music-dashboard
+sudo systemctl restart music-stream-providers music-bot music-dashboard
 ```
 
 For local database services add their actual unit names to `After=`. External database hosts do not need local unit dependencies. On SIGTERM the bot releases Remedia sessions, destroys the Discord client, closes Socket.IO/HTTP and disconnects MongoDB/Redis. A stalled shutdown has a 15-second exit deadline. Use a separate supervised service for a standalone Remedia server, with its own user, working directory, environment file and `ExecStart=/path/to/remedia serve --config /path/to/remedia.config.json`.

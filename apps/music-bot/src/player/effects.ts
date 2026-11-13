@@ -1,6 +1,6 @@
 import type { GuildQueue } from "discord-player";
-import { useDatabase } from "#bot/hooks/useDatabase";
-import type { IGuildSchema } from "#bot/bootstrap/mongo/Guild.schema";
+import { useDatabase } from "@/hooks/useDatabase";
+import type { IGuildSchema } from "@/bootstrap/mongo/Guild.schema";
 
 export const frequencies = [
   25, 40, 63, 100, 160, 250, 400, 630, 1000, 1600, 2500, 4000, 6300, 10000,

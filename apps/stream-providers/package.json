@@ -1,0 +1,32 @@
+{
+  "name": "stream-providers",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "engines": {
+    "bun": ">=1.4.4"
+  },
+  "dependencies": {
+    "@discord-player/plugin-host": "8.0.0-dev.5",
+    "discord-player-youtubei": "3.1.0",
+    "discord-player-spotify": "1.1.9",
+    "discord-player-applemusic": "1.0.3",
+    "discord-player-soundcloud": "1.0.7",
+    "discord-player": "8.0.0-dev.5",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.4",
+    "typescript": "^6.0.3"
+  },
+  "files": [
+    "src",
+    "app.config.json"
+  ]
+}

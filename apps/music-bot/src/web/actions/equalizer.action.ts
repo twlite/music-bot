@@ -1,11 +1,11 @@
-import { filterGraph } from "#bot/player/effects";
-import { fetchPlayerOptions } from "#bot/player/playerOptions";
-import { useDatabase } from "#bot/hooks/useDatabase";
-import { useQueue } from "#bot/player/runtime";
-import { SocketUser } from "../socket.js";
-import type { Socket } from "socket.io";
-import { PlayerMetadata } from "#bot/player/PlayerMetadata";
-import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
+import { filterGraph } from '@/player/effects';
+import { fetchPlayerOptions } from '@/player/player-options.js';
+import { useDatabase } from '@/hooks/useDatabase';
+import { useQueue } from '@/player/runtime';
+import { SocketUser } from '../socket.js';
+import type { Socket } from 'socket.io';
+import { PlayerMetadata } from '@/player/player-metadata.js';
+import { EmbedGenerator } from '@/utils/embed-generator.js';
 
 export type EqualizerBand = {
   band: number;
@@ -35,7 +35,7 @@ export async function EqualizerAction(
     await queue.metadata.channel.send({
       embeds: [
         EmbedGenerator.Success({
-          title: "Equalizer updated!",
+          title: 'Equalizer updated!',
           description: `The equalizer was updated by ${info.displayName} (<@${info.id}>).`,
         }),
       ],

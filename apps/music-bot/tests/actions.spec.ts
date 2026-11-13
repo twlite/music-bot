@@ -15,7 +15,7 @@ const { queue, db } = vi.hoisted(() => ({
 }));
 vi.mock("../src/player/runtime.js", () => ({ useQueue: () => queue }));
 vi.mock("../src/hooks/useDatabase.js", () => ({ useDatabase: () => db }));
-vi.mock("../src/utils/EmbedGenerator.js", () => ({
+vi.mock("../src/utils/embed-generator.js", () => ({
   EmbedGenerator: { Success: (data: unknown) => data },
 }));
 import { PauseAction } from "../src/web/actions/pause.action.js";

@@ -1,11 +1,14 @@
-import mongoose from 'mongoose';
-import { HooksRegistry, Symbols } from '#bot/hooks/registry';
-import { GuildModel } from './mongo/Guild.schema.js';
-import { PlaylistModel } from './mongo/Playlist.Schema.js';
+import { config } from "@/config";
+import mongoose from "mongoose";
+import { HooksRegistry, Symbols } from "@/hooks/registry";
+import { GuildModel } from "./mongo/Guild.schema.js";
+import { PlaylistModel } from "./mongo/Playlist.Schema.js";
 
-const db = await mongoose.connect(process.env.DATABASE_URL!);
+const db = await mongoose.connect(
+  process.env.DATABASE_URL || config.database.url,
+);
 
-console.log('Connected to the database');
+console.log("Connected to the database");
 
 export class MongoDatabase {
   public guild = GuildModel;

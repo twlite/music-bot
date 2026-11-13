@@ -2,11 +2,11 @@
 
 ## Public dashboard access
 
-Keep MongoDB, Redis and Remedia on a private network. The example Compose file publishes only the bot/API and dashboard, on loopback. Put TLS in front of ports 3000 and 5000, e.g. `music.example.com` and `api.example.com`. The API proxy must forward WebSocket Upgrade/Connection headers for `/socket.io/`. Set the exact dashboard origin in `WEB_INTERFACE_URL`, and the public API origin in the dashboard build variables. Rebuild after changing any `NEXT_PUBLIC_*` value.
+Keep MongoDB, Redis and Remedia on a private network. The example Compose file publishes only the bot/API and dashboard, on loopback. Put TLS in front of ports 3000 and 5000, e.g. `music.example.com` and `api.example.com`. The API proxy must forward WebSocket Upgrade/Connection headers for `/socket.io/`. Set the exact dashboard origin in `http.dashboardUrl` in `app.config.json`, and the public API origin in the dashboard build variables. Rebuild after changing any `NEXT_PUBLIC_*` value.
 
 Session cookies use HTTP-only, SameSite=Strict and Secure when the dashboard URL is HTTPS. Keep both origins on the same site. A dashboard on an unrelated domain is unsupported by this cookie configuration. Existing reusable v6 tokens use a different Redis namespace and are not accepted. Do not log URL query strings at the reverse proxy; the initial `/web` link carries a one-time code.
 
-One bot/API instance is the supported default. `SOCKET_REDIS_ADAPTER=true` only shares Socket.IO room broadcasts; it does not coordinate Discord queue ownership across independently running bots. Running multiple clients with the same bot token is not a supported scaling configuration.
+One bot/API instance is the supported default. `redis.socketAdapter: true` in `app.config.json` only shares Socket.IO room broadcasts; it does not coordinate Discord queue ownership across independently running bots. Running multiple clients with the same bot token is not a supported scaling configuration.
 
 ## Backup with Docker
 
@@ -41,7 +41,7 @@ docker compose exec -T mongo mongorestore --archive --gzip --nsFrom='music-bot.*
 docker compose exec mongo mongosh music-bot-restore --eval 'db.playlists.countDocuments({})'
 ```
 
-To use it, stop the bot, change its database URI to `music-bot-restore`, then restart. Compose's `DATABASE_URL` environment entry overrides `.env`; edit that entry when choosing the restored database. Manual hosting changes `apps/music-bot/.env` or the systemd environment file.
+To use it, stop the bot, change its database URI to `music-bot-restore`, then restart. Edit `database.url` in `docker/app.config.json` when choosing the restored database; a nonempty secret `DATABASE_URL` overrides that address. Manual hosting changes `apps/music-bot/.env` or the systemd environment file.
 
 For a release rollback, check out the previous application revision, reinstall its lockfile dependencies and rebuild. Point it at the matching restored database. This migration does not bulk-rewrite old playlists, so existing v6 data remains available for rollback. New v8 playlists may not be readable by the old application; retain the pre-upgrade archive.
 

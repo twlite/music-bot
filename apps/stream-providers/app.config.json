@@ -1,0 +1,7 @@
+{
+  "name": "music-bot-stream-providers",
+  "hostId": "stream-providers",
+  "hostname": "127.0.0.1",
+  "port": 5678,
+  "publicUrl": "http://localhost:5678"
+}

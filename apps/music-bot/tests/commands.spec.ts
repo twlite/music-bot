@@ -1,45 +1,37 @@
 import { it, expect, vi } from "vitest";
-import { commandHandler } from "../src/commands/handler.js";
+import { beforeExecute } from "../src/app/commands/+middleware.js";
 import { publicTrack } from "../src/player/public-media.js";
 it("blocks users outside the bot voice channel", async () => {
-  const run = vi.fn();
   const interaction = {
+    isChatInputCommand: () => true,
     inCachedGuild: () => true,
     member: { voice: { channel: { id: "different" } } },
     guild: { members: { me: { voice: { channel: { id: "bot" } } } } },
     reply: vi.fn(),
   };
-  await commandHandler(run)({ interaction } as never);
-  expect(run).not.toHaveBeenCalled();
+  await expect(
+    beforeExecute({
+      interaction,
+      commandName: "play",
+    } as never),
+  ).rejects.toThrow();
   expect(interaction.reply).toHaveBeenCalledWith(
     expect.objectContaining({ flags: 64 }),
   );
 });
 it("dispatches an authorized command", async () => {
-  const run = vi.fn();
   const interaction = {
+    isChatInputCommand: () => true,
     inCachedGuild: () => true,
     member: { voice: { channel: { id: "same" } } },
     guild: { members: { me: { voice: { channel: { id: "same" } } } } },
+    reply: vi.fn(),
   };
-  await commandHandler(run)({ interaction } as never);
-  expect(run).toHaveBeenCalledOnce();
-});
-it("turns deferred command failures into editable errors", async () => {
-  const run = vi.fn().mockRejectedValue(new Error("internal signed URL"));
-  const interaction = {
-    inCachedGuild: () => true,
-    member: { voice: {} },
-    guild: { members: {} },
-    deferred: true,
-    editReply: vi.fn(),
-  };
-  await commandHandler(run, false)({ interaction } as never);
-  expect(interaction.editReply).toHaveBeenCalledWith(
-    expect.objectContaining({
-      content: expect.not.stringContaining("signed URL"),
-    }),
-  );
+  await beforeExecute({
+    interaction,
+    commandName: "play",
+  } as never);
+  expect(interaction.reply).not.toHaveBeenCalled();
 });
 it("omits credentials and provider stream state from dashboard DTOs", () => {
   const data = publicTrack({

@@ -1,6 +1,5 @@
 import { definePlugin, Playlist } from "discord-player";
-import { useDatabase } from "#bot/hooks/useDatabase";
-import { player } from "./runtime.js";
+import { useDatabase } from "@/hooks/useDatabase";
 import { savedTrackURL } from "./persistence.js";
 
 /** Resolves saved public URLs through the currently registered source plugins. */
@@ -31,7 +30,7 @@ export const customPlaylists = definePlugin({
           throw new Error(
             "Saved track has no safe public URL; original playlist has been retained",
           );
-        const result = await player.search(url, {
+        const result = await ctx.player.search(url, {
           requestedBy: requester,
           signal,
         });

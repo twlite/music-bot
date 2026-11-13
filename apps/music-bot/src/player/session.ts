@@ -1,7 +1,7 @@
 import type { Guild, User } from "discord.js";
 import { randomBytes, createHash } from "node:crypto";
-import { useRedisAsync } from "#bot/hooks/useRedis";
-import { client } from "#bot/bootstrap/client";
+import { useRedisAsync } from "@/hooks/useRedis";
+import { client } from "@/bootstrap/client";
 
 const key = (token: string) => createHash("sha256").update(token).digest("hex");
 export interface SessionData {

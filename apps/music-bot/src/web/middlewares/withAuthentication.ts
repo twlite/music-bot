@@ -2,7 +2,7 @@ import {
   validateSession,
   cookieToken,
   authorizeAction,
-} from "#bot/player/session";
+} from "@/player/session";
 import { NextFunction, Request, Response } from "express";
 
 export async function withAuthentication(

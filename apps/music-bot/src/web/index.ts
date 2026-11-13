@@ -1,9 +1,10 @@
-import { publicTrack, publicPlaylist } from "#bot/player/public-media";
-import { exchangeSession } from "#bot/player/session";
+import { config } from "@/config";
+import { publicTrack, publicPlaylist } from "@/player/public-media";
+import { exchangeSession } from "@/player/session";
 import { createServer } from "node:http";
 import { SocketUser, createSocketServer } from "./socket.js";
 import express from "express";
-import { useMainPlayer } from "#bot/player/runtime";
+import { useMainPlayer } from "@/player/runtime";
 import { withAuthentication } from "./middlewares/withAuthentication.js";
 import cors from "cors";
 
@@ -11,18 +12,18 @@ const app = express();
 const server = createServer(app);
 const io = await createSocketServer(server);
 
-app.use(cors({ origin: process.env.WEB_INTERFACE_URL, credentials: true }));
+app.use(cors({ origin: config.http.dashboardUrl, credentials: true }));
 app.use(express.json({ limit: "8kb" }));
 app.get("/health", (_req, res) => {
   const ready = Boolean(useMainPlayer().getRemedia(false));
   res.status(ready ? 200 : 503).json({ ready });
 });
 app.post("/auth/exchange", async (req, res) => {
-  if (req.headers.origin !== process.env.WEB_INTERFACE_URL)
+  if (req.headers.origin !== config.http.dashboardUrl)
     return void res.sendStatus(403);
   const token = await exchangeSession(req.body?.code ?? "");
   if (!token) return void res.sendStatus(401);
-  const secure = process.env.WEB_INTERFACE_URL?.startsWith("https://")
+  const secure = config.http.dashboardUrl?.startsWith("https://")
     ? "; Secure"
     : "";
   res.setHeader(

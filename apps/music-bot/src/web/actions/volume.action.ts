@@ -1,8 +1,8 @@
-import { useQueue } from "#bot/player/runtime";
-import { SocketUser } from "../socket.js";
-import type { Socket } from "socket.io";
-import { PlayerMetadata } from "#bot/player/PlayerMetadata";
-import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
+import { useQueue } from '@/player/runtime';
+import { SocketUser } from '../socket.js';
+import type { Socket } from 'socket.io';
+import { PlayerMetadata } from '@/player/player-metadata.js';
+import { EmbedGenerator } from '@/utils/embed-generator.js';
 
 export async function VolumeAction(
   info: SocketUser,
@@ -19,7 +19,7 @@ export async function VolumeAction(
     await queue.metadata.channel.send({
       embeds: [
         EmbedGenerator.Success({
-          title: "Volume updated!",
+          title: 'Volume updated!',
           description: `The volume was set to ${queue.node.volume}% by ${info.displayName} (<@${info.id}>).`,
         }),
       ],

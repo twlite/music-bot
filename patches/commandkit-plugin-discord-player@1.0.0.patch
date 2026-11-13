@@ -1,0 +1,28 @@
+diff --git a/dist/index.js b/dist/index.js
+index 5beff2922b746fca107a6039e5a538cfc751592a..a850c3c4a69a01d5effc6ddb5bffa0ea24ef0a04 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -17,7 +17,7 @@ class DiscordPlayerPlugin extends commandkit_1.RuntimePlugin {
+             this.initialize(ctx);
+         }
+         else {
+-            ctx.commandkit.client.once('ready', () => {
++            ctx.commandkit.client.once('clientReady', () => {
+                 this.initialize(ctx);
+             });
+         }
+@@ -29,12 +29,12 @@ class DiscordPlayerPlugin extends commandkit_1.RuntimePlugin {
+         if (!source.inGuild())
+             return false;
+         const player = (0, discord_player_1.useMainPlayer)();
+-        await player.context.provide({ guild: source.guild }, execute);
++        await player.context.provide({ guildId: source.guildId }, execute);
+         return true;
+     }
+     initialize(ctx) {
+         const player = (0, discord_player_1.useMainPlayer)();
+-        const queueEvents = Array.from(new Set(Object.values(discord_player_1.GuildQueueEvent)));
++        const queueEvents = Array.from(new Set(Object.values(discord_player_1.GuildQueueEvents)));
+         const playerEvents = Array.from(new Set(Object.values(discord_player_1.PlayerEvent)));
+         queueEvents.forEach((event) => {
+             player.events.on(event, (...args) => {

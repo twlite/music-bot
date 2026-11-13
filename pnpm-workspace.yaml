@@ -20,3 +20,13 @@ minimumReleaseAgeExclude:
   - "@discord-player/plugin-host@8.0.0-dev.5"
   - "@remedia/plugin-host@0.2.1"
   - discord-player@8.0.0-dev.5
+patchedDependencies:
+  commandkit-plugin-discord-player@1.0.0: patches/commandkit-plugin-discord-player@1.0.0.patch
+  commandkit@1.2.6: patches/commandkit@1.2.6.patch
+
+# Published youtubei 3.1.0 imports these but omits them from its dependencies.
+packageExtensions:
+  discord-player-youtubei@3.1.0:
+    dependencies:
+      simple-ytdl-core: 1.2.2
+      undici: ^7.0.0

@@ -13,10 +13,10 @@ const { findOne, search, record } = vi.hoisted(() => {
 vi.mock("../src/hooks/useDatabase.js", () => ({
   useDatabase: () => ({ playlist: { findOne } }),
 }));
-vi.mock("../src/player/runtime.js", () => ({ player: { search } }));
 import { customPlaylists } from "../src/player/custom-playlists.js";
 const handlers = new Map<string, (...args: any[]) => any>();
 await customPlaylists().definition.setup({
+  player: { search },
   on: (name: string, callback: (...args: any[]) => any) =>
     handlers.set(name, callback),
 } as never);

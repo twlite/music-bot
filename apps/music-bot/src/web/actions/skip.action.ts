@@ -1,8 +1,8 @@
-import { useQueue } from "#bot/player/runtime";
-import { SocketUser } from "../socket.js";
-import type { Socket } from "socket.io";
-import { PlayerMetadata } from "#bot/player/PlayerMetadata";
-import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
+import { useQueue } from '@/player/runtime';
+import { SocketUser } from '../socket.js';
+import type { Socket } from 'socket.io';
+import { PlayerMetadata } from '@/player/player-metadata.js';
+import { EmbedGenerator } from '@/utils/embed-generator.js';
 
 export async function SkipAction(
   info: SocketUser,
@@ -18,7 +18,7 @@ export async function SkipAction(
       await queue.metadata.channel.send({
         embeds: [
           EmbedGenerator.Success({
-            title: "Track skipped!",
+            title: 'Track skipped!',
             description: `Track was skipped to next track from the website by ${info.displayName} (<@${info.id}>).`,
           }),
         ],
@@ -32,7 +32,7 @@ export async function SkipAction(
     await queue.metadata.channel.send({
       embeds: [
         EmbedGenerator.Success({
-          title: "Track skipped!",
+          title: 'Track skipped!',
           description: `The track was skipped to previous track by ${info.displayName} (<@${info.id}>).`,
         }),
       ],

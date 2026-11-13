@@ -1,5 +1,5 @@
-import { publicTrack, publicPlaylist } from "#bot/player/public-media";
-import { useQueue } from "#bot/player/runtime";
+import { publicTrack, publicPlaylist } from "@/player/public-media";
+import { useQueue } from "@/player/runtime";
 import { SocketUser } from "../socket.js";
 import type { Socket } from "socket.io";
 

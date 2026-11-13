@@ -1,4 +1,16 @@
-import { data, run } from "../../commands/misc/ping.js";
-import { commandHandler } from "#bot/commands/handler";
-export const command = data;
-export const chatInput = commandHandler(run, false);
+import type { ChatInputCommandContext } from "./_types.js";
+import type { CommandData } from "commandkit";
+
+export const command: CommandData = {
+  name: "ping",
+  description: "Pong!",
+};
+
+export const chatInput = async ({
+  interaction,
+  client,
+}: ChatInputCommandContext) => {
+  const clientLatency = client.ws.ping.toFixed(0);
+
+  interaction.reply(`:ping_pong: Pong! ${clientLatency}ms`);
+};

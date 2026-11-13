@@ -1,8 +1,8 @@
-import { useQueue } from "#bot/player/runtime";
-import { SocketUser } from "../socket.js";
-import type { Socket } from "socket.io";
-import { PlayerMetadata } from "#bot/player/PlayerMetadata";
-import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
+import { useQueue } from '@/player/runtime';
+import { SocketUser } from '../socket.js';
+import type { Socket } from 'socket.io';
+import { PlayerMetadata } from '@/player/player-metadata.js';
+import { EmbedGenerator } from '@/utils/embed-generator.js';
 
 export async function ShuffleAction(
   info: SocketUser,
@@ -24,9 +24,9 @@ export async function ShuffleAction(
     await queue.metadata.channel.send({
       embeds: [
         EmbedGenerator.Success({
-          title: `${state ? "Enabled" : "Disabled"} shuffle mode!`,
+          title: `${state ? 'Enabled' : 'Disabled'} shuffle mode!`,
           description: `The shuffle mode was ${
-            state ? "enabled" : "disabled"
+            state ? 'enabled' : 'disabled'
           } by ${info.displayName} (<@${info.id}>).`,
         }),
       ],

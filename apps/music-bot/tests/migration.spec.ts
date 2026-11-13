@@ -1,3 +1,4 @@
+import { config, appConfigSchema } from "../src/config.js";
 import { describe, it, expect, vi } from "vitest";
 import { createRemediaNodes } from "../src/player/config.js";
 import { savedTrackURL } from "../src/player/persistence.js";
@@ -5,28 +6,33 @@ import { mediaURL } from "../src/player/direct-media.js";
 import { filterGraph } from "../src/player/effects.js";
 
 describe("playback configuration", () => {
-  it("defaults to embedded", () =>
-    expect(createRemediaNodes({})).toEqual([
+  it("defaults to embedded", async () =>
+    expect(await createRemediaNodes()).toEqual([
       { id: "local", type: "embedded" },
     ]));
-  it("requires remote credentials", () =>
-    expect(() => createRemediaNodes({ REMEDIA_MODE: "remote" })).toThrow(
-      "requires",
-    ));
-  it("rejects invalid modes", () =>
-    expect(() => createRemediaNodes({ REMEDIA_MODE: "typo" })).toThrow());
-  it("uses one native node shape for remote", () =>
+  it("requires remote credentials", async () =>
     expect(
-      createRemediaNodes({
-        REMEDIA_MODE: "remote",
-        REMEDIA_URL: "ws://localhost:8787",
-        REMEDIA_USERNAME: "bot",
-        REMEDIA_PASSWORD: "secret",
-      })[0],
-    ).toMatchObject({
-      type: "remote",
-      auth: { username: "bot", password: "secret" },
-    }));
+      createRemediaNodes(
+        { mode: "remote", url: "ws://localhost:8787", username: "bot" },
+        "",
+      ),
+    ).rejects.toThrow("REMEDIA_PASSWORD"));
+  it("rejects invalid settings", () =>
+    expect(() =>
+      appConfigSchema.parse({
+        ...config,
+        crossfade: { enabled: true, durationMs: -1 },
+      }),
+    ).toThrow());
+  it("uses one native node shape for remote", async () =>
+    expect(
+      await createRemediaNodes(
+        { mode: "remote", url: "ws://localhost:8787", username: "bot" },
+        "secret",
+      ),
+    ).toMatchObject([
+      { type: "remote", auth: { username: "bot", password: "secret" } },
+    ]));
 });
 describe("saved playlists", () => {
   it("reads legacy v6 without modifying it", () => {

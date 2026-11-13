@@ -1,10 +1,10 @@
-import { commandHandler } from "#bot/commands/handler";
-import { useQueue } from "#bot/player/runtime";
+import type { ChatInputCommandContext } from "./_types.js";
+import { useQueue } from "@/player/runtime";
 export const command = {
   name: "shuffle",
   description: "Toggle dynamic queue shuffle",
 };
-export const chatInput = commandHandler(async ({ interaction }) => {
+export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
   const queue = useQueue(interaction.guildId!);
   if (!queue) {
     await interaction.reply({ content: "No queue exists.", flags: 64 });
@@ -12,4 +12,4 @@ export const chatInput = commandHandler(async ({ interaction }) => {
   }
   const enabled = queue.toggleShuffle();
   await interaction.reply(`Shuffle ${enabled ? "enabled" : "disabled"}.`);
-});
+};

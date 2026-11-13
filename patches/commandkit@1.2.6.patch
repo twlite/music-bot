@@ -1,0 +1,27 @@
+diff --git a/dist/app/router/EventsRouter.js b/dist/app/router/EventsRouter.js
+index c8d3a953069df093d9f45e14e5666a82a0eca026..8cf06a2d5029c0e278025b5dc3d340535b46285a 100644
+--- a/dist/app/router/EventsRouter.js
++++ b/dist/app/router/EventsRouter.js
+@@ -138,18 +138,19 @@ var EventsRouter = class {
+ 			if (file.name.startsWith("_")) continue;
+ 			if (file.isDirectory()) {
+ 				const nextPath = (0, node_path.join)(path, file.name);
+-				await this.scanEvent(file.name, nextPath, namespace, listeners);
++				await this.scanEvent(file.name, nextPath, namespace, isNamespace ? [] : listeners);
+ 				continue;
+ 			}
+ 			if (file.isFile() && /\.(m|c)?(j|t)sx?$/.test(file.name)) listeners.push((0, node_path.join)(file.parentPath, file.name));
+ 		}
+ 		if (!isNamespace) {
+-			const existing = this.events.get(event);
++			const key = namespace ? `${namespace}:${event}` : event;
++			const existing = this.events.get(key);
+ 			if (existing) {
+ 				existing.listeners = Array.from(/* @__PURE__ */ new Set([...existing.listeners, ...listeners]));
+ 				return;
+ 			}
+-			this.events.set(event, {
++			this.events.set(key, {
+ 				event,
+ 				path,
+ 				listeners,

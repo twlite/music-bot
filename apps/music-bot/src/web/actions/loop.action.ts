@@ -1,9 +1,9 @@
-import { useDatabase } from "#bot/hooks/useDatabase";
-import { useQueue } from "#bot/player/runtime";
-import { SocketUser } from "../socket.js";
-import type { Socket } from "socket.io";
-import { PlayerMetadata } from "#bot/player/PlayerMetadata";
-import { EmbedGenerator } from "#bot/utils/EmbedGenerator";
+import { useDatabase } from '@/hooks/useDatabase';
+import { useQueue } from '@/player/runtime';
+import { SocketUser } from '../socket.js';
+import type { Socket } from 'socket.io';
+import { PlayerMetadata } from '@/player/player-metadata.js';
+import { EmbedGenerator } from '@/utils/embed-generator.js';
 
 export async function LoopAction(
   info: SocketUser,
@@ -13,7 +13,7 @@ export async function LoopAction(
   const queue = useQueue<PlayerMetadata>(info.guildId);
   if (!queue?.node.session) return socket.disconnect(true);
 
-  if (!["OFF", "TRACK", "QUEUE", "AUTOPLAY"][mode]) return;
+  if (!['OFF', 'TRACK', 'QUEUE', 'AUTOPLAY'][mode]) return;
 
   queue.setRepeatMode(mode);
   await useDatabase().guild.updateOne(
@@ -22,14 +22,14 @@ export async function LoopAction(
     { upsert: true, runValidators: true },
   );
 
-  socket.to(info.guildId).emit("loop", mode);
+  socket.to(info.guildId).emit('loop', mode);
 
   if (queue.metadata.channel.isSendable())
     await queue.metadata.channel.send({
       embeds: [
         EmbedGenerator.Success({
-          title: "Loop mode updated!",
-          description: `The loop mode was set to ${["OFF", "TRACK", "QUEUE", "AUTOPLAY"][mode]} by ${info.displayName} (<@${info.id}>).`,
+          title: 'Loop mode updated!',
+          description: `The loop mode was set to ${['OFF', 'TRACK', 'QUEUE', 'AUTOPLAY'][mode]} by ${info.displayName} (<@${info.id}>).`,
         }),
       ],
     });

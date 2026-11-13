@@ -6,17 +6,14 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "commandkit build",
     "start": "node dist/index.js",
-    "dev": "pnpm run build && node dist/index.js",
+    "dev": "commandkit dev",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vitest run",
     "test:native": "node scripts/native-smoke.mjs",
     "test:remote": "node scripts/remote-smoke.mjs"
-  },
-  "imports": {
-    "#bot/*": "./dist/*.js"
   },
   "keywords": [],
   "author": "twlite",
@@ -27,6 +24,7 @@
     "@remedia/node": "0.2.1",
     "@socket.io/redis-adapter": "^8.3.0",
     "commandkit": "^1.2.6",
+    "commandkit-plugin-discord-player": "1.0.0",
     "cors": "^2.8.6",
     "discord-player": "8.0.0-dev.5",
     "discord.js": "14.28.1",
@@ -34,25 +32,20 @@
     "express": "^5.3.0",
     "ioredis": "6.0.0",
     "mongoose": "9.12.1",
-    "node-html-parser": "^9.0.7",
-    "quickjs-emscripten": "^0.32.0",
     "socket.io": "4.8.4",
-    "soundcloud.ts": "^0.7.4",
-    "spotify-url-info": "^3.3.3",
-    "youtubei.js": "^18.3.0",
     "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5",
     "@types/node": "^24",
-    "rimraf": "^6.1.4",
     "tsconfig": "workspace:*",
     "typescript": "^6.0.3",
     "vitest": "5.1.0"
   },
   "files": [
     "dist",
-    "docker-mode.mjs"
+    "app.config.json",
+    "commandkit.config.ts"
   ]
 }
