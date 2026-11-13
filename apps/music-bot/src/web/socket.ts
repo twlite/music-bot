@@ -1,7 +1,7 @@
 import { syncStatistics } from './statistics.js';
 import { config } from '@/config';
 import type { Server } from 'node:http';
-import { Server as SocketServer } from 'socket.io';
+import { io } from './io.js';
 import { Collection } from 'discord.js';
 import { z } from 'zod';
 import {
@@ -28,14 +28,7 @@ export type SocketUser = NonNullable<
 export const socketInfo = new Collection<string, SocketUser>();
 
 export async function createSocketServer(server: Server) {
-  const origin = config.http.dashboardUrl;
-  if (!origin) throw new Error('http.dashboardUrl is required');
-  const io = new SocketServer(server, {
-    serveClient: false,
-    maxHttpBufferSize: 8192,
-    cors: { origin, credentials: true },
-    allowRequest: (req, done) => done(null, req.headers.origin === origin),
-  });
+  io.attach(server);
   if (config.redis.socketAdapter) {
     const redis = await useRedisAsync();
     const sub = redis.duplicate();

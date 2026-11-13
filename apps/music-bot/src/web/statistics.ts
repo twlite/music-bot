@@ -1,4 +1,4 @@
-import { io } from "./index.js";
+import { io } from "./io.js";
 import { useQueue } from "@/player/runtime";
 import { client } from "@/bootstrap/client";
 import { publicTrack } from "@/player/public-media";
