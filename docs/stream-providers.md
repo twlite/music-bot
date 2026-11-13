@@ -16,7 +16,7 @@ docker compose up -d --build
 docker compose --profile remote up -d --build
 ```
 
-The service listens privately at `http://stream-providers:5678`. It has no host port mapping. Compose mounts `docker/stream-providers.config.json`; its `publicUrl` is the address Remedia uses for media downloads. `docker/app.config.json` registers the same host in the bot. `docker/remedia.config.json` contains the authenticated remote host registration.
+The service listens privately at `http://stream-providers:5678`. It has no host port mapping. Compose mounts `docker/stream-providers.config.json`; its `publicUrl` is the address Remedia uses for media downloads. `docker/app.config.json` registers the host in embedded mode. In remote mode, the bot discovers the host automatically through Remedia using the registration in `docker/remedia.config.json`.
 
 Inspect startup with `docker compose logs stream-providers`. Health checks pass only after all four extractors have loaded. Initialization contacts YouTube, so the source host needs working outbound HTTPS before the bot can start.
 
@@ -62,7 +62,7 @@ curl --fail http://localhost:5678/health
 curl --fail http://localhost:5678/.well-known/remedia
 ```
 
-The bot's default `sourcePluginHosts` entry already points to this address. For a separate source-host machine, change that URL and the source host's `publicUrl` to its reachable origin; set `hostname` to its private listening address. Use HTTPS when crossing an untrusted network. Discovery is public; execution requires the bearer token. Media grants are short-lived, single-use URLs issued by the host, so do not log or share them.
+For embedded playback, the bot's default `sourcePluginHosts` entry already points to this address. Remote playback discovers providers through the Remedia server registration below; the bot does not register these HTTP hosts itself. For a separate source-host machine, change that URL and the source host's `publicUrl` to its reachable origin; set `hostname` to its private listening address. Use HTTPS when crossing an untrusted network. Discovery is public; execution requires the bearer token. Media grants are short-lived, single-use URLs issued by the host, so do not log or share them.
 
 SIGINT and SIGTERM stop the listener, cancel streams and close the source host. See the [systemd example](manual-hosting.md#linux-systemd) to keep it running with the bot and dashboard.
 

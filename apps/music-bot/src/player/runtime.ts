@@ -44,7 +44,7 @@ export const useTimeline = (guildId: string) => {
     : null;
 };
 
-/** Register independently deployed Remedia-compatible source hosts. */
+/** Register HTTP source hosts for embedded playback. */
 export async function registerSourceHosts() {
   for (const host of config.sourcePluginHosts) {
     await player.plugins.registerHost({

@@ -3,7 +3,10 @@ import { player, registerSourceHosts } from "@/player/runtime";
 
 const handler: EventHandler<"clientReady"> = async (client) => {
   await player.initialize(client.user.id);
-  await registerSourceHosts();
+
+  if (player.remedia?.nodes.some((node) => node.type === "embedded")) {
+    await registerSourceHosts();
+  }
 };
 
 export default handler;
