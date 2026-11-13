@@ -1,33 +1,35 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, useRef } from 'react';
 import io, { Socket } from 'socket.io-client';
-import type { SocketEvents, SocketActions } from 'music-bot/src/web/types';
+import type { SocketEvents, SocketActions } from '@music-bot/shared';
 
-const socket: Socket<SocketEvents, SocketActions> = io(
-  process.env.NEXT_PUBLIC_GATEWAY_URL!,
-  {
-    auth(cb) {
-      cb({
-        token: sessionStorage.getItem('token'),
-      });
-    },
-    autoConnect: false,
-  }
-);
+const socket: Socket<
+  { [K in keyof SocketEvents]: (...args: SocketEvents[K]) => void },
+  { [K in keyof SocketActions]: (...args: SocketActions[K]) => void }
+> = io(process.env.NEXT_PUBLIC_GATEWAY_URL!, {
+  withCredentials: true,
+  autoConnect: false,
+});
 
 const SocketContext = createContext(socket);
+const snapshots = new Map<keyof SocketEvents, unknown[]>();
+const synchronizedEvents = new Set(['statistics', 'position', 'queue', 'equalizer', 'ready']);
 
-export function SocketContextProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [connecting, setConnecting] = useState(true);
+export function SocketContextProvider({ children }: { children: React.ReactNode }) {
+  const [connecting, setConnecting] = useState(false);
+
+  useEffect(() => {
+    const remember = (name: string, ...args: unknown[]) => {
+      if (synchronizedEvents.has(name)) snapshots.set(name as keyof SocketEvents, args);
+    };
+    const clear = () => snapshots.clear();
+    socket.onAny(remember);
+    socket.on('disconnect', clear);
+    return () => {
+      socket.offAny(remember);
+      socket.off('disconnect', clear);
+      snapshots.clear();
+    };
+  }, []);
 
   useEffect(() => {
     const onConnect = () => {
@@ -65,19 +67,22 @@ export function SocketContextProvider({
     </SocketContext.Provider>
   );
 }
-export function useSocketEvent<T extends keyof SocketEvents>(
-  name: T,
-  handler: (...args: SocketEvents[T]) => void
-) {
+export function useSocketEvent<T extends keyof SocketEvents>(name: T, handler: (...args: SocketEvents[T]) => void) {
   const { socket } = useSocket();
 
+  const callback = useRef(handler);
   useEffect(() => {
-    socket.on(name, handler as any);
-
+    callback.current = handler;
+  }, [handler]);
+  useEffect(() => {
+    const listener = (...args: SocketEvents[T]) => callback.current(...args);
+    socket.on(name, listener as any);
+    const snapshot = snapshots.get(name);
+    if (snapshot) listener(...(snapshot as SocketEvents[T]));
     return () => {
-      socket.off(name, handler as any);
+      socket.off(name, listener as any);
     };
-  }, [name, handler, socket]);
+  }, [name, socket]);
 }
 
 export function useSocket() {
@@ -87,16 +92,11 @@ export function useSocket() {
     throw new Error('useSocket must be used within SocketContextProvider');
   }
 
-  const send = useCallback<
-    <T extends keyof SocketActions>(
-      name: T,
-      ...values: SocketActions[T]
-    ) => void
-  >(
+  const send = useCallback<<T extends keyof SocketActions>(name: T, ...values: SocketActions[T]) => void>(
     (name, ...params) => {
       return void socket.emit(name as any, ...params);
     },
-    [socket]
+    [socket],
   );
 
   return { socket, send };

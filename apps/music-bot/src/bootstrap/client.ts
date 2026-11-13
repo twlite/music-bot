@@ -1,12 +1,7 @@
 import { Client } from 'discord.js';
-import { HooksRegistry, Symbols } from '#bot/hooks/registry';
-import {
-  ClientIntents,
-  CommandsPath,
-  EventsPath,
-  ValidationsPath,
-} from '#bot/utils/constants';
-import { CommandKit } from 'commandkit';
+import { HooksRegistry, Symbols } from '@/hooks/registry';
+import { ClientIntents } from '@/utils/constants';
+import { commandkit } from 'commandkit';
 
 const client = new Client({
   intents: ClientIntents,
@@ -14,13 +9,6 @@ const client = new Client({
 
 HooksRegistry.set(Symbols.kClient, client);
 
-const commandkit = new CommandKit({
-  client,
-  bulkRegister: false,
-  commandsPath: CommandsPath,
-  eventsPath: EventsPath,
-  skipBuiltInValidations: true,
-  validationsPath: ValidationsPath,
-});
+commandkit.setClient(client as unknown as Parameters<typeof commandkit.setClient>[0]);
 
 export { client, commandkit };

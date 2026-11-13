@@ -1,152 +1,147 @@
-import { useSocket, useSocketEvent } from '@/context/socket.context';
-import type { SerializedTrack } from 'music-bot/src/web/types';
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
+import { useSocket, useSocketEvent } from '@/context/socket.context';
+import { usePlayback } from '@/hooks/use-playback';
 import { AlbumCover } from './album-cover';
 import { VolumeController } from './volume-controller';
 import { TimelineActions } from './timeline-actions';
 import { TrackProgress } from './track-progress';
-import { useToast } from '../ui/use-toast';
-import { ActionIcon } from './action-icon';
-import { EqualizerIcon } from './equalizer-icon';
 import { Equalizer } from './equalizer';
-import { cn } from '@/lib/utils';
+import { QueueList, RequestedBy } from './queue-list';
+import { Lyrics } from './lyrics';
+import { useToast } from '@/components/ui/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MixerHorizontalIcon, ListBulletIcon, ReaderIcon } from '@radix-ui/react-icons';
 
-export function PlayerController({ showArt = false }) {
+export function PlayerController({ showArt: _showArt = false }) {
+  const { state, position } = usePlayback();
   const { send } = useSocket();
-  const [currentTrack, setCurrentTrack] = useState<SerializedTrack | null>(
-    null
-  );
-  const [showEqualizer, setShowEqualizer] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const [volume, setVolume] = useState(50);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState({
-    current: '0:00',
-    total: '0:00',
-  });
-  const [shuffle, setShuffle] = useState(false);
   const { toast } = useToast();
-  const onvolumechange = useCallback(
-    (volume: number) => {
-      send('volume', volume);
-    },
-    [send]
-  );
+  const [tab, setTab] = useState('queue');
+  const track = state?.track ?? null;
+  const onVolumeChange = useCallback((volume: number) => send('volume', volume), [send]);
 
-  useSocketEvent('playerStart', (track) => {
-    setCurrentTrack(track);
-    setPaused(false);
-  });
-
-  useSocketEvent('pause', (paused) => {
-    setPaused(paused);
-  });
-
-  useSocketEvent('volume', (volume) => {
-    setVolume(volume);
-  });
-
-  useSocketEvent('statistics', (data) => {
-    setPaused(data.paused);
-    setVolume(data.volume);
-    setProgress(data.timestamp?.progress ?? 0);
-    setDuration({
-      current: data.timestamp?.current.label ?? '0:00',
-      total: data.timestamp?.total.label ?? '0:00',
-    });
-    setCurrentTrack(data.track);
-    setShuffle(data.shuffle);
-  });
-
-  useSocketEvent('playerFinish', () => {
-    setCurrentTrack(null);
-  });
-
-  useSocketEvent('queued', ({ data, playlist }) => {
+  useSocketEvent('queued', ({ data, playlist }) =>
     toast({
-      title: `${playlist ? 'Playlist' : 'Track'} queued!`,
-      // @ts-expect-error
-      description: `${data.title} by ${
-        // @ts-expect-error
-        typeof data.author === 'string' ? data.author : data.author.name
-      } has been queued successfully!`,
+      title: `${playlist ? 'Playlist' : 'Track'} queued`,
+      description: data.title,
       variant: 'success',
       duration: 3000,
-    });
-  });
-
-  useSocketEvent('error', (error) => {
-    toast({
-      title: 'Error!',
-      description: error,
-      variant: 'destructive',
-      duration: 3000,
-    });
-  });
+    }),
+  );
+  useSocketEvent('error', (description) =>
+    toast({ title: 'Unable to complete action', description, variant: 'destructive', duration: 5000 }),
+  );
 
   return (
-    <>
-      {showEqualizer ? (
-        <Equalizer onClose={() => setShowEqualizer(false)} />
-      ) : showArt && currentTrack ? (
-        <div className="grid place-items-center h-[80vh]">
-          <div className="text-center flex items-center flex-col">
-            <AlbumCover
-              icon={currentTrack.thumbnail?.url ?? currentTrack.thumbnail}
-              fallback={currentTrack.title}
-            />
-            <h1 className="text-2xl mt-4">{currentTrack.title}</h1>
-            <span className="text-sm text-muted-foreground">
-              {currentTrack?.author ?? 'N/A'}
-            </span>
-          </div>
+    <div className="mx-auto max-w-[1440px] space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Your server, your soundtrack
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">Listening room</h1>
         </div>
-      ) : null}
-      <div className="fixed bottom-0 left-0 px-5 py-3 border-t w-full flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <AlbumCover
-            icon={currentTrack?.thumbnail?.url ?? currentTrack?.thumbnail}
-            fallback={currentTrack?.title}
-            className="h-12 w-12"
-          />
-
-          <div className="flex flex-col items-start">
-            <Link
-              href={currentTrack?.url || '#'}
-              target={currentTrack ? '_blank' : undefined}
-              className="font-semibold hover:underline"
-              title={currentTrack?.title}
-            >
-              {currentTrack?.title
-                ?.slice(0, 27)
-                .concat(currentTrack.title.length > 27 ? '...' : '') ??
-                'Not Playing'}
-            </Link>
-            <span className="text-xs text-muted-foreground">
-              {currentTrack?.author ?? 'N/A'}
-            </span>
-          </div>
-        </div>
-        <div className="flex flex-col items-center justify-center w-[60%]">
-          <TimelineActions paused={paused} shuffle={shuffle} />
-          <TrackProgress duration={duration} progress={progress} />
-        </div>
-        <div className="flex items-center gap-3 w-[8%]">
-          <ActionIcon
-            name="Equalizer"
-            onClick={() => setShowEqualizer((p) => !p)}
-          >
-            <EqualizerIcon
-              className={cn(
-                'h-4 w-4 cursor-pointer',
-                showEqualizer ? 'text-destructive' : ''
-              )}
-            />
-          </ActionIcon>
-          <VolumeController volume={volume} onChange={onvolumechange} />
-        </div>
+        <Badge variant="secondary">{state?.listeners ?? 0} listening</Badge>
       </div>
-    </>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(280px,0.8fr)_minmax(0,1.6fr)]">
+        <Card className="overflow-hidden lg:sticky lg:top-6">
+          <CardContent className="space-y-6 p-6">
+            <div className="relative mx-auto aspect-square w-full max-w-80 overflow-hidden rounded-xl bg-muted shadow-lg">
+              <AlbumCover
+                icon={track?.thumbnail}
+                fallback={track?.title ?? 'Nothing playing'}
+                className="h-full w-full rounded-none [&>svg]:h-24 [&>svg]:w-24"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-primary">Now playing</span>
+                {track?.live && <Badge variant="outline">Live</Badge>}
+              </div>
+              <h2 className="line-clamp-2 text-xl font-semibold leading-tight">
+                {track ? (
+                  <Link
+                    href={/^https?:\/\//.test(track.url) ? track.url : '#'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:underline"
+                  >
+                    {track.title}
+                  </Link>
+                ) : (
+                  'The room is quiet'
+                )}
+              </h2>
+              <p className="truncate text-sm text-muted-foreground">
+                {track?.author ?? 'Join a voice channel and start a song with /play.'}
+              </p>
+              {track && <RequestedBy track={track} />}
+            </div>
+            <TrackProgress
+              trackId={track?.id}
+              position={position}
+              total={state?.timestamp?.total.value ?? 0}
+              disabled={!track || track.live}
+            />
+            <div className={!track ? 'pointer-events-none opacity-40' : ''}>
+              <div className="flex justify-center">
+                <TimelineActions paused={state?.paused ?? true} shuffle={state?.shuffle ?? false} />
+              </div>
+            </div>
+            <div className="flex items-center gap-5 border-t pt-5">
+              <div className="min-w-0 flex-1">
+                <VolumeController volume={state?.volume ?? 50} onChange={onVolumeChange} />
+              </div>
+              <Select
+                value={String(state?.repeatMode ?? 0)}
+                disabled={!track}
+                onValueChange={(value) => send('loop', Number(value) as 0 | 1 | 2 | 3)}
+              >
+                <SelectTrigger aria-label="Repeat mode" className="w-28">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Repeat off</SelectItem>
+                  <SelectItem value="1">Repeat track</SelectItem>
+                  <SelectItem value="2">Repeat queue</SelectItem>
+                  <SelectItem value="3">Autoplay</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="min-w-0">
+          <CardContent className="p-4 sm:p-6">
+            <Tabs value={tab} onValueChange={setTab}>
+              <TabsList className="mb-6 grid w-full grid-cols-3">
+                <TabsTrigger value="queue">
+                  <ListBulletIcon className="mr-2" />
+                  Queue
+                </TabsTrigger>
+                <TabsTrigger value="lyrics">
+                  <ReaderIcon className="mr-2" />
+                  Lyrics
+                </TabsTrigger>
+                <TabsTrigger value="effects">
+                  <MixerHorizontalIcon className="mr-2" />
+                  Sound
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="queue" forceMount hidden={tab !== 'queue'}>
+                <QueueList />
+              </TabsContent>
+              <TabsContent value="lyrics" forceMount hidden={tab !== 'lyrics'}>
+                <Lyrics track={track} position={position} active={tab === 'lyrics'} />
+              </TabsContent>
+              <TabsContent value="effects">{tab === 'effects' && <Equalizer state={state} />}</TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

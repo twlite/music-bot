@@ -1,0 +1,59 @@
+{
+  "listen": "0.0.0.0:8787",
+  "users": [
+    {
+      "username": "media-bot",
+      "password": "env('REMEDIA_RPC_PASSWORD')"
+    }
+  ],
+  "media": {
+    "allowedFileRoots": [],
+    "allowHttp": false
+  },
+  "limits": {
+    "maxConnections": 4,
+    "maxClientSessions": 4,
+    "maxTotalPlayers": 64
+  },
+  "audio": {
+    "crossfade": {
+      "enabled": true,
+      "durationMs": 5000,
+      "prepareBeforeMs": 30000,
+      "curve": "equalPower"
+    }
+  },
+  "pluginHosts": [
+    {
+      "id": "stream-providers",
+      "url": "http://stream-providers:5678",
+      "auth": {
+        "type": "bearer",
+        "token": "env('STREAM_PROVIDERS_TOKEN')"
+      },
+      "allowHttp": true,
+      "operations": [
+        {
+          "pluginId": "discord-player.source",
+          "operation": "metadata.execute",
+          "replaySafe": true
+        },
+        {
+          "pluginId": "discord-player.source",
+          "operation": "source.search",
+          "replaySafe": true
+        },
+        {
+          "pluginId": "discord-player.source",
+          "operation": "source.related",
+          "replaySafe": true
+        },
+        {
+          "pluginId": "discord-player.source",
+          "operation": "source.stream",
+          "replaySafe": false
+        }
+      ]
+    }
+  ]
+}

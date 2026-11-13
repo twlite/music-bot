@@ -1,131 +1,140 @@
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  BAND_COUNT,
-  EqualizerBand,
-  EqualizerConfigurationPreset,
-} from '@/lib/equalizer';
-import { useSocket, useSocketEvent } from '@/context/socket.context';
 import { useEffect, useState } from 'react';
-import { Slider } from '../ui/slider';
-import { Separator } from '../ui/separator';
+import { EqualizerConfigurationPreset, type EqualizerBand, type IStatistics } from '@music-bot/shared';
+import { useSocket } from '@/context/socket.context';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
-type PresetName = keyof typeof EqualizerConfigurationPreset;
+const frequencies = [
+  '25',
+  '40',
+  '63',
+  '100',
+  '160',
+  '250',
+  '400',
+  '630',
+  '1k',
+  '1.6k',
+  '2.5k',
+  '4k',
+  '6.3k',
+  '10k',
+  '16k',
+];
 
-const presetMap = Object.keys(EqualizerConfigurationPreset) as PresetName[];
-
-function DefaultPresets() {
+export function Equalizer({ state }: { state: IStatistics | null }) {
   const { send } = useSocket();
+  const [bands, setBands] = useState<EqualizerBand[]>(EqualizerConfigurationPreset.Flat);
+  useEffect(() => {
+    if (state?.equalizer) setBands(state.equalizer);
+  }, [state?.equalizer]);
+  const disabled = !state?.connected;
 
   return (
-    <Select
-      defaultValue="default"
-      onValueChange={(selection) => {
-        const preset = EqualizerConfigurationPreset[selection as PresetName];
-        if (!preset) return;
-        send('equalizer', preset);
-      }}
-    >
-      <SelectTrigger className="w-[200px]">
-        <SelectValue placeholder="Select a preset" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="default">Select</SelectItem>
-        {presetMap.map((name) => (
-          <SelectItem key={name} value={name}>
-            {name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-}
-
-export function Equalizer({ onClose }: { onClose: () => void }) {
-  const { send } = useSocket();
-  const [bands, setBands] = useState<EqualizerBand[]>(
-    EqualizerConfigurationPreset.Flat
-  );
-
-  useSocketEvent('equalizer', (bands) => {
-    setBands(bands);
-  });
-
-  useSocketEvent('statistics', (data) => {
-    setBands(data.equalizer || EqualizerConfigurationPreset.Flat);
-  });
-
-  return (
-    <div className="container py-4">
-      <div className="flex items-center gap-4">
-        <ArrowLeftIcon className="h-5 w-5 cursor-pointer" onClick={onClose} />
-        <h3 className="font-medium text-base">Equalizer settings</h3>
-      </div>
-      <div className="p-4">
-        <div className="flex items-end gap-2">
-          <h4 className="text-sm mb-2 text-muted-foreground">Presets</h4>
-          <DefaultPresets />
-        </div>
-        <div className="flex justify-between w-full p-8 bg-secondary/30 rounded-lg mt-4 relative">
-          <span className="text-muted-foreground text-xs absolute top-6 left-2 z-10">
-            0.25
-          </span>
-          <span className="text-muted-foreground text-xs absolute top-[45%] left-2 z-10">
-            0
-          </span>
-          <span className="text-muted-foreground text-xs absolute bottom-12 left-2 z-10">
-            -0.25
-          </span>
-          <Separator className="w-[92%] absolute top-[47.5%] left-12" />
-          <div className="flex justify-between w-full px-4">
-            {Array.from(
-              {
-                length: BAND_COUNT,
-              },
-              (_, i) => {
-                return (
-                  <div key={i} className="flex flex-col items-center">
-                    <Slider
-                      defaultValue={[0]}
-                      min={-0.25}
-                      max={0.25}
-                      step={0.01}
-                      orientation="vertical"
-                      className="flex-col h-[300px] w-[7px]"
-                      value={[bands[i]?.gain ?? 0]}
-                      onValueChange={(e) => {
-                        const config = { band: i, gain: e[0] };
-                        const newBands = bands.map((b) =>
-                          b.band === i ? config : b
-                        );
-
-                        setBands(newBands);
-                      }}
-                      onValueCommit={(e) => {
-                        const config = { band: i, gain: e[0] };
-                        const newBands = bands.map((b) =>
-                          b.band === i ? config : b
-                        );
-
-                        send('equalizer', newBands);
-                      }}
-                    />
-                    <span className="text-muted-foreground text-sm">
-                      Band {i + 1}
-                    </span>
-                  </div>
-                );
-              }
-            )}
+    <div className="space-y-5">
+      <Card>
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-4">
+          <div>
+            <CardTitle>Equalizer</CardTitle>
+            <CardDescription className="mt-2">Shape your sound with 15 bands or choose a preset.</CardDescription>
           </div>
-        </div>
-      </div>
+          <Select
+            value={state?.equalizerPreset ?? 'Flat'}
+            disabled={disabled}
+            onValueChange={(name) => {
+              const preset = EqualizerConfigurationPreset[name as keyof typeof EqualizerConfigurationPreset];
+              if (preset) {
+                setBands(preset);
+                send('equalizer', preset);
+              }
+            }}
+          >
+            <SelectTrigger className="w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="custom" disabled>
+                Custom
+              </SelectItem>
+              {Object.keys(EqualizerConfigurationPreset).map((name) => (
+                <SelectItem key={name} value={name}>
+                  {name.replace(/([a-z])([A-Z])/g, '$1 $2')}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-5 gap-x-5 gap-y-6 lg:grid-cols-[repeat(15,minmax(0,1fr))]">
+            {bands.map((band, i) => (
+              <div key={i} className="flex min-w-0 flex-col items-center gap-3">
+                <span className="text-[10px] tabular-nums text-muted-foreground">
+                  {band.gain > 0 ? '+' : ''}
+                  {band.gain.toFixed(2)}
+                </span>
+                <Slider
+                  aria-label={`${frequencies[i]} Hz equalizer gain`}
+                  orientation="vertical"
+                  className="h-28 w-5 flex-col [&>span:first-child]:h-full [&>span:first-child]:w-1.5 [&>span:first-child>span]:w-full"
+                  min={-0.25}
+                  max={1}
+                  step={0.01}
+                  disabled={disabled}
+                  value={[band.gain]}
+                  onValueChange={([gain]) =>
+                    setBands((previous) => previous.map((b) => (b.band === i ? { band: i, gain } : b)))
+                  }
+                  onValueCommit={([gain]) =>
+                    send(
+                      'equalizer',
+                      bands.map((b) => (b.band === i ? { band: i, gain } : b)),
+                    )
+                  }
+                />
+                <span className="text-[10px] text-muted-foreground">{frequencies[i]} Hz</span>
+              </div>
+            ))}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-5"
+            disabled={disabled}
+            onClick={() => send('equalizer', EqualizerConfigurationPreset.Flat)}
+          >
+            Reset equalizer
+          </Button>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <CardTitle>Audio effects</CardTitle>
+            <Badge variant="secondary">{state?.effects.length ?? 0} active</Badge>
+          </div>
+          <CardDescription>Mix multiple effects. Equalizer settings stay active alongside them.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {state?.effectPresets.map((effect) => (
+            <label
+              key={effect.name}
+              className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm"
+            >
+              {effect.label}
+              <Switch
+                aria-label={effect.label}
+                disabled={disabled}
+                checked={state.effects.includes(effect.name)}
+                onCheckedChange={(enabled) => send('effect', { name: effect.name, enabled })}
+              />
+            </label>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -1,0 +1,31 @@
+{
+  "http": {
+    "port": 5000,
+    "dashboardUrl": "http://localhost:3000"
+  },
+  "database": {
+    "url": "mongodb://127.0.0.1:27017/music-bot"
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "socketAdapter": false
+  },
+  "remedia": {
+    "mode": "remote",
+    "url": "remedia://127.0.0.1:8787",
+    "username": "media-bot"
+  },
+  "crossfade": {
+    "enabled": true,
+    "durationMs": 5000
+  },
+  "mediaAllowedHosts": ["cdn.discordapp.com", "media.discordapp.net"],
+  "sourcePluginHosts": [
+    {
+      "hostId": "stream-providers",
+      "url": "http://localhost:5678",
+      "tokenEnvironmentVariable": "STREAM_PROVIDERS_TOKEN"
+    }
+  ]
+}

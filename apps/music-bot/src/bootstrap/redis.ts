@@ -1,9 +1,11 @@
 import { Redis } from 'ioredis';
-import { HooksRegistry, Symbols } from '#bot/hooks/registry';
-import { RedisConfig } from '#bot/utils/constants';
+import { HooksRegistry, Symbols } from '@/hooks/registry';
+import { config } from '@/config';
 
 const redis = new Redis({
-  ...RedisConfig,
+  host: config.redis.host,
+  port: config.redis.port,
+  password: process.env.REDIS_PASSWORD,
   lazyConnect: true,
 });
 

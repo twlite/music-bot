@@ -3,3 +3,5 @@ node_modules
 !.env.example
 .env*
 dist
+.commandkit
+commandkit-env.d.ts

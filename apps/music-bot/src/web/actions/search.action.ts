@@ -1,14 +1,11 @@
-import { useQueue } from 'discord-player';
+import { publicTrack, publicPlaylist } from '@/player/public-media';
+import { useQueue } from '@/player/runtime';
 import { SocketUser } from '../socket.js';
 import type { Socket } from 'socket.io';
 
-export async function SearchAction(
-  info: SocketUser,
-  socket: Socket,
-  query: string
-) {
+export async function SearchAction(info: SocketUser, socket: Socket, query: string) {
   const queue = useQueue(info.guildId);
-  if (!queue?.connection) return socket.disconnect(true);
+  if (!queue?.node.session) return socket.disconnect(true);
 
   try {
     const hasTrack = queue.currentTrack;
@@ -19,8 +16,8 @@ export async function SearchAction(
     if (result.isEmpty()) return socket.emit('error', 'No results found');
 
     return socket.emit(hasTrack ? 'queued' : 'play', {
-      playlist: result.hasPlaylist(),
-      data: (result.playlist || result.tracks[0]).serialize(),
+      playlist: Boolean(result.playlist),
+      data: result.playlist ? publicPlaylist(result.playlist) : publicTrack(result.tracks[0]),
     });
   } catch {
     return socket.emit('error', 'No results found');

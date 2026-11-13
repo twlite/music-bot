@@ -1,37 +1,27 @@
-import { useQueue } from 'discord-player';
+import { setEqualizer } from '@/player/effects';
+import { useQueue } from '@/player/runtime';
 import { SocketUser } from '../socket.js';
 import type { Socket } from 'socket.io';
-import { PlayerMetadata } from '#bot/player/PlayerMetadata';
-import { EmbedGenerator } from '#bot/utils/EmbedGenerator';
+import { PlayerMetadata } from '@/player/player-metadata.js';
+import { EmbedGenerator } from '@/utils/embed-generator.js';
 
 export type EqualizerBand = {
   band: number;
   gain: number;
 };
 
-export async function EqualizerAction(
-  info: SocketUser,
-  socket: Socket,
-  eq: EqualizerBand[]
-) {
+export async function EqualizerAction(info: SocketUser, socket: Socket, eq: EqualizerBand[]) {
   const queue = useQueue<PlayerMetadata>(info.guildId);
-  if (!queue?.connection) return socket.disconnect(true);
+  if (!queue?.node.session) return socket.disconnect(true);
 
-  if (
-    !queue.filters.equalizer ||
-    !eq.length ||
-    eq.some((e) => isNaN(e.band) || isNaN(e.gain))
-  )
-    return;
-
-  queue.filters.equalizer.setEQ(eq);
-
-  await queue.metadata.channel.send({
-    embeds: [
-      EmbedGenerator.Success({
-        title: 'Equalizer updated!',
-        description: `The equalizer was updated by ${info.displayName} (<@${info.id}>).`,
-      }),
-    ],
-  });
+  await setEqualizer(queue, eq);
+  if (queue.metadata.channel.isSendable())
+    await queue.metadata.channel.send({
+      embeds: [
+        EmbedGenerator.Success({
+          title: 'Equalizer updated!',
+          description: `The equalizer was updated by ${info.displayName} (<@${info.id}>).`,
+        }),
+      ],
+    });
 }

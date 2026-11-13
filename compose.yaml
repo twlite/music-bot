@@ -1,0 +1,112 @@
+name: music-bot
+services:
+  bot:
+    build:
+      context: .
+      target: bot
+    env_file: .env
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./docker/app.config.json:/app/app.config.json:ro
+    ports: ['127.0.0.1:5000:5000']
+    depends_on:
+      mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      stream-providers: { condition: service_healthy }
+      remedia: { condition: service_healthy, required: false }
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:5000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      start_period: 60s
+  web:
+    build:
+      context: .
+      target: web
+      args:
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:5000}
+        NEXT_PUBLIC_GATEWAY_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:5000}
+    ports: ['127.0.0.1:3000:3000']
+    restart: unless-stopped
+    init: true
+    depends_on:
+      bot: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+  mongo:
+    image: mongo:8.2.2
+    volumes: ['mongo-data:/data/db']
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'db.adminCommand({ping:1}).ok']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:8.2.3-alpine
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory', '256mb', '--maxmemory-policy', 'volatile-lru']
+    volumes: ['redis-data:/data']
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  stream-providers:
+    build:
+      context: .
+      target: stream-providers
+    environment:
+      STREAM_PROVIDERS_TOKEN: ${STREAM_PROVIDERS_TOKEN:?Set STREAM_PROVIDERS_TOKEN in .env}
+    volumes:
+      - ./docker/stream-providers.config.json:/app/app.config.json:ro
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 20s
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'bun',
+          '-e',
+          "fetch('http://127.0.0.1:5678/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      start_period: 90s
+      retries: 4
+  remedia:
+    image: ghcr.io/twlite/remedia:0.2.1
+    build:
+      context: https://github.com/twlite/remedia.git#d3cfa5b7b6644dc5e29142a0722294c933f1159c
+      dockerfile: docker/Dockerfile
+      args:
+        REMEDIA_VERSION: 0.2.1
+    profiles: ['remote']
+    environment:
+      REMEDIA_RPC_PASSWORD: ${REMEDIA_PASSWORD:?Set REMEDIA_PASSWORD in .env}
+      STREAM_PROVIDERS_TOKEN: ${STREAM_PROVIDERS_TOKEN:?Set STREAM_PROVIDERS_TOKEN in .env}
+    depends_on:
+      stream-providers: { condition: service_healthy }
+    volumes: ['./docker/remedia.config.json:/config/remedia.config.json:ro']
+    restart: unless-stopped
+    stop_grace_period: 30s
+volumes:
+  mongo-data:
+  redis-data:
