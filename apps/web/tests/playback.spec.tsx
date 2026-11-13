@@ -48,6 +48,16 @@ it('reconciles a lyric seek and rejects older snapshots and snapshots for previo
   expect(view.result.current.position).toBe(5500);
 });
 
+it('interpolates source progress at the active tempo and reanchors after a filter change', async () => {
+  const view = renderHook(usePlayback);
+  act(() => events.get('statistics')!({ ...statistics, playbackRate: 1.25 }));
+  await act(() => vi.advanceTimersByTimeAsync(2000));
+  expect(view.result.current.position).toBeCloseTo(7500);
+  act(() => events.get('position')!({ ...packet, positionMs: 7500, playbackRate: 0.8 }));
+  await act(() => vi.advanceTimersByTimeAsync(1000));
+  expect(view.result.current.position).toBeCloseTo(8300);
+});
+
 it('freezes precisely on disconnect and stops interpolating while paused or buffering', async () => {
   const view = renderHook(usePlayback);
   act(() => events.get('statistics')!(statistics));
