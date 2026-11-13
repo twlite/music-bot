@@ -22,7 +22,7 @@ export function usePlayback() {
     clock.current = {
       value: packet.positionMs,
       total: packet.durationMs,
-      rate: packet.playbackRate,
+      rate: packet.playbackRate === undefined ? 1 : packet.playbackRate,
       received: performance.now(),
       advancing: packet.playing && !packet.paused && socket.connected,
       sentAt: packet.sentAt,
@@ -40,7 +40,7 @@ export function usePlayback() {
       trackId: trackId.current,
       positionMs: data.timestamp?.current.value ?? 0,
       durationMs: data.timestamp?.total.value ?? 0,
-      playbackRate: data.playbackRate,
+      playbackRate: data.playbackRate ?? 1,
       playing: data.playing,
       paused: data.paused,
       sentAt: data.sentAt,
