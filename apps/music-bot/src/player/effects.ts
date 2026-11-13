@@ -33,6 +33,8 @@ export const effectPresets = [
   'bassboost',
   '8D',
   'vocalboost',
+  'nightcore',
+  'vaporwave',
   'treble',
   'normalizer',
   'normalizer2',
