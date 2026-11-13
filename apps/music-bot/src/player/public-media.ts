@@ -39,3 +39,10 @@ function publicRequester(value: Track['requestedBy']): SerializedTrack['requeste
         : null,
   };
 }
+
+/** Embed footers are plain text, so extract a human-readable requester instead of coercing objects. */
+export function requesterFooter(track: Track) {
+  const user = publicRequester(track.requestedBy);
+  const name = user?.displayName === 'Unknown user' ? user.id : user?.displayName;
+  return { text: `Requested by ${name ?? 'Autoplay'}`, iconURL: user?.displayAvatarURL ?? undefined };
+}

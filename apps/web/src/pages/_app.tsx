@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 import { SocketContextProvider, useSocket } from '@/context/socket.context';
 import { InvalidSession } from '@/components/auth/InvalidSession';
-import type { SocketUser } from '@music-bot/shared';
 import { ThemeProvider } from '@/components/theme';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -18,21 +17,17 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
   const [invalidSession, setInvalidSession] = useState(true);
 
   useEffect(() => {
-    const onConnect = () => {
-      setInvalidSession(false);
-    };
-
     const onError = () => {
       setInvalidSession(true);
     };
 
-    const onSession = (session: SocketUser) => {
-      sessionStorage.setItem('session', JSON.stringify(session));
+    const onSession = () => {
+      setInvalidSession(false);
     };
 
     if (!router.isReady) return;
     socket.on('ready', onSession);
-    socket.on('connect', onConnect);
+    socket.on('disconnect', onError);
     socket.on('connect_error', onError);
     const code = typeof router.query.session === 'string' ? router.query.session : null;
     if (code) {
@@ -53,7 +48,7 @@ export default function RootLayout({ Component, pageProps }: AppProps) {
 
     return () => {
       socket.disconnect();
-      socket.off('connect', onConnect);
+      socket.off('disconnect', onError);
       socket.off('connect_error', onError);
       socket.off('ready', onSession);
     };

@@ -12,7 +12,7 @@ const socket: Socket<
 
 const SocketContext = createContext(socket);
 const snapshots = new Map<keyof SocketEvents, unknown[]>();
-const synchronizedEvents = new Set(['statistics', 'queue', 'equalizer', 'ready']);
+const synchronizedEvents = new Set(['statistics', 'position', 'queue', 'equalizer', 'ready']);
 
 export function SocketContextProvider({ children }: { children: React.ReactNode }) {
   const [connecting, setConnecting] = useState(false);

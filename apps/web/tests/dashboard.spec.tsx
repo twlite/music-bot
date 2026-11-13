@@ -84,22 +84,25 @@ it('shows requester snapshots and moves by stable IDs with keyboard and remove c
 
 it('adds trimmed track queries through the queue form', () => {
   render(<QueueList />);
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: '  new track  ' } });
-  fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+  fireEvent.change(screen.getByRole('combobox', { name: 'Track URL or search query' }), {
+    target: { value: '  new track  ' },
+  });
+  fireEvent.submit(screen.getByRole('combobox', { name: 'Track URL or search query' }).closest('form')!);
   expect(send).toHaveBeenCalledWith('play', 'new track');
-  expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('');
+  expect((screen.getByRole('combobox', { name: 'Track URL or search query' }) as HTMLInputElement).value).toBe('');
 });
 
 it('ignores stale lyric responses, highlights the source timeline and debounces line seeking', async () => {
   vi.useFakeTimers();
   render(<Lyrics track={track} position={1500} />);
+  const requestId = send.mock.calls.find(([name]) => name === 'lyrics')![1].requestId;
   const lines = [
     { timestampMs: 1000, line: 'First line' },
     { timestampMs: 2000, line: 'Second line' },
   ];
   act(() => events.get('lyrics')?.({ trackId: 'old-track', status: 'ready', lines, plain: null }));
   expect(screen.queryByText('First line')).toBeNull();
-  act(() => events.get('lyrics')?.({ trackId: track.id, status: 'ready', lines, plain: null }));
+  act(() => events.get('lyrics')?.({ trackId: track.id, requestId, status: 'ready', lines, plain: null }));
   expect(screen.getByText('First line').getAttribute('aria-current')).toBe('true');
   fireEvent.click(screen.getByText('Second line'));
   await act(() => vi.advanceTimersByTimeAsync(300));
@@ -150,4 +153,56 @@ it('provides queue operations from the right-click context menu', async () => {
   fireEvent.contextMenu(row, { clientX: 20, clientY: 20 });
   await user.click(screen.getByRole('menuitem', { name: 'Play next' }));
   expect(send).toHaveBeenCalledWith('queueNext', { trackId: 'track-b' });
+});
+
+it('supports manual lyric searches and ignores a late automatic response', () => {
+  render(<Lyrics track={track} position={0} />);
+  const automatic = send.mock.calls.find(([name]) => name === 'lyrics')![1];
+  fireEvent.change(screen.getByRole('textbox', { name: 'Search lyrics' }), { target: { value: 'Better song artist' } });
+  fireEvent.submit(screen.getByRole('textbox', { name: 'Search lyrics' }).closest('form')!);
+  const manual = send.mock.calls.at(-1)![1];
+  expect(manual).toMatchObject({ trackId: track.id, query: 'Better song artist', resultIndex: 0 });
+  act(() =>
+    events.get('lyrics')!({
+      trackId: track.id,
+      requestId: automatic.requestId,
+      status: 'ready',
+      lines: [],
+      plain: 'Old text',
+    }),
+  );
+  expect(screen.queryByText('Old text')).toBeNull();
+  act(() =>
+    events.get('lyrics')!({
+      trackId: track.id,
+      requestId: manual.requestId,
+      query: manual.query,
+      status: 'ready',
+      lines: [],
+      plain: 'Correct text',
+    }),
+  );
+  expect(screen.getByText('Correct text')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Use track details' }));
+  expect(send.mock.calls.at(-1)![1].query).toBe('');
+});
+
+it('shows selectable suggestions below Up next and queues the selected URL', async () => {
+  vi.useFakeTimers();
+  const fetch = vi.fn().mockResolvedValue(Response.json([{ ...track, title: 'Suggested song' }]));
+  vi.stubGlobal('fetch', fetch);
+  try {
+    render(<QueueList />);
+    fireEvent.change(screen.getByRole('combobox', { name: 'Track URL or search query' }), {
+      target: { value: 'suggested' },
+    });
+    await act(() => vi.advanceTimersByTimeAsync(500));
+    expect(fetch.mock.calls[0][0]).toContain('/search?query=suggested');
+    expect(fetch.mock.calls[0][1].credentials).toBe('include');
+    fireEvent.click(screen.getByRole('option', { name: /Suggested song/ }));
+    expect(send).toHaveBeenCalledWith('play', track.url);
+    expect((screen.getByRole('combobox', { name: 'Track URL or search query' }) as HTMLInputElement).value).toBe('');
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

@@ -20,3 +20,10 @@ export const effectSchema = z.object({
 });
 export const queueItemSchema = z.object({ trackId });
 export const queueMoveSchema = z.object({ trackId, beforeId: trackId.nullable() });
+
+export const lyricsSchema = z.object({
+  trackId,
+  query: z.string().trim().max(200).optional(),
+  resultIndex: z.number().int().min(0).max(7).optional(),
+  requestId: z.string().min(1).max(128).optional(),
+});

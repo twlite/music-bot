@@ -1,37 +1,60 @@
 import { useEffect, useRef, useState } from 'react';
-import type { IStatistics } from '@music-bot/shared';
+import type { IStatistics, PlaybackPosition } from '@music-bot/shared';
 import { useSocket, useSocketEvent } from '@/context/socket.context';
 
 export const timeLabel = (ms: number) =>
   `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
 
-/** Interpolate locally; only authoritative server updates reset the clock. */
+/** Interpolate locally and reconcile against periodic output-clock snapshots and playback events. */
 export function usePlayback() {
   const [state, setState] = useState<IStatistics | null>(null);
   const [position, setPosition] = useState(0);
-  const clock = useRef({ value: 0, received: 0, total: 0, paused: true });
+  const trackId = useRef<string | null>(null);
+  const clock = useRef({ value: 0, received: 0, total: 0, advancing: false, sentAt: 0 });
   const { socket } = useSocket();
+  const currentPosition = () => {
+    const c = clock.current;
+    return Math.max(0, Math.min(c.total || Infinity, c.value + (c.advancing ? performance.now() - c.received : 0)));
+  };
+
+  const reconcile = (packet: PlaybackPosition) => {
+    if (packet.trackId !== trackId.current || packet.sentAt < clock.current.sentAt) return;
+    clock.current = {
+      value: packet.positionMs,
+      total: packet.durationMs,
+      received: performance.now(),
+      advancing: packet.playing && !packet.paused && socket.connected,
+      sentAt: packet.sentAt,
+    };
+    setPosition(packet.positionMs);
+  };
 
   useSocketEvent('statistics', (data) => {
-    clock.current = {
-      value: data.timestamp?.current.value ?? 0,
-      total: data.timestamp?.total.value ?? 0,
-      received: performance.now(),
-      paused: data.paused || !socket.connected,
-    };
+    if (trackId.current !== (data.track?.id ?? null)) {
+      trackId.current = data.track?.id ?? null;
+      clock.current.sentAt = 0;
+    }
     setState(data);
-    setPosition(clock.current.value);
+    reconcile({
+      trackId: trackId.current,
+      positionMs: data.timestamp?.current.value ?? 0,
+      durationMs: data.timestamp?.total.value ?? 0,
+      playing: data.playing,
+      paused: data.paused,
+      sentAt: data.sentAt,
+    });
   });
+  useSocketEvent('position', reconcile);
 
   useEffect(() => {
     const stop = () => {
-      clock.current.paused = true;
+      clock.current.value = currentPosition();
+      clock.current.received = performance.now();
+      clock.current.advancing = false;
+      setPosition(clock.current.value);
     };
     socket.on('disconnect', stop);
-    const timer = setInterval(() => {
-      const c = clock.current;
-      setPosition(Math.min(c.total, c.value + (c.paused ? 0 : performance.now() - c.received)));
-    }, 200);
+    const timer = setInterval(() => setPosition(currentPosition()), 200);
     return () => {
       clearInterval(timer);
       socket.off('disconnect', stop);

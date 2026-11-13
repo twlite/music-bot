@@ -1,9 +1,17 @@
-import { equalizerSchema, effectSchema, seekSchema, queueItemSchema, queueMoveSchema } from './schemas.js';
+import { POSITION_UPDATE_INTERVAL_MS } from './position.js';
+import {
+  equalizerSchema,
+  effectSchema,
+  seekSchema,
+  queueItemSchema,
+  queueMoveSchema,
+  lyricsSchema,
+} from './schemas.js';
 import { editQueue, seek } from './actions/queue.action.js';
 import { toggleEffect, rememberEffects } from '@/player/effects';
 import { useQueue } from '@/player/runtime';
 import { getLyrics, releaseLyrics } from './lyrics.js';
-import { syncStatistics, sendQueue } from './statistics.js';
+import { syncStatistics, sendQueue, syncPosition } from './statistics.js';
 import { config } from '@/config';
 import type { Server } from 'node:http';
 import { io } from './io.js';
@@ -50,8 +58,8 @@ export async function createSocketServer(server: Server) {
   });
   // One drift correction per occupied guild, independent of connected client count.
   const drift = setInterval(() => {
-    for (const guildId of new Set([...socketInfo.values()].map((u) => u.guildId))) syncStatistics({ guildId });
-  }, 15000).unref();
+    for (const guildId of new Set([...socketInfo.values()].map((u) => u.guildId))) syncPosition(guildId);
+  }, POSITION_UPDATE_INTERVAL_MS).unref();
   server.once('close', () => {
     clearInterval(drift);
   });
@@ -84,7 +92,7 @@ export async function createSocketServer(server: Server) {
                 ? input.name
                 : ''
             : '');
-        if (Date.now() - (lastActions.get(key) ?? 0) < 150) return;
+        if (name !== 'lyrics' && Date.now() - (lastActions.get(key) ?? 0) < 150) return;
         lastActions.set(key, Date.now());
         try {
           const parsed = schema.safeParse(input);
@@ -95,6 +103,7 @@ export async function createSocketServer(server: Server) {
           if (name === 'equalizer') io.to(user.guildId).emit('equalizer', parsed.data);
           syncStatistics({ guildId: user.guildId });
         } catch {
+          if (name === 'seek') syncPosition(user.guildId);
           socket.emit('error', 'Action failed. Check your voice channel and try again.');
         }
       });
@@ -119,11 +128,12 @@ export async function createSocketServer(server: Server) {
     action('queueRemove', queueItemSchema, (value) => editQueue(user.guildId, value.trackId, 'remove'));
     action('queueMove', queueMoveSchema, (value) => editQueue(user.guildId, value.trackId, 'move', value.beforeId));
     action('queueNext', queueItemSchema, (value) => editQueue(user.guildId, value.trackId, 'next'));
-    action('lyrics', queueItemSchema, async (value) => {
+    action('lyrics', lyricsSchema, async (value) => {
       const queue = useQueue(user.guildId);
       if (!queue?.currentTrack || queue.currentTrack.id !== value.trackId) return;
-      const lyrics = await getLyrics(queue);
-      if (socket.connected && queue.currentTrack?.id === value.trackId) socket.emit('lyrics', lyrics);
+      const lyrics = await getLyrics(queue, value.query, value.resultIndex);
+      if (socket.connected && queue.currentTrack?.id === value.trackId)
+        socket.emit('lyrics', { ...lyrics, requestId: value.requestId });
     });
     socket.once('disconnect', () => {
       clearTimeout(expiry);

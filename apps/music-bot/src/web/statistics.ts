@@ -1,3 +1,5 @@
+import { playbackPosition } from './position.js';
+import { formatVolume } from '@/utils/format-volume';
 import { effectState, effectPresets } from '@/player/effects';
 import type { GuildQueue, Track } from 'discord-player';
 import type { SerializedTrack } from '@music-bot/shared';
@@ -25,21 +27,32 @@ export function syncStatistics({ guildId }: { guildId: string }) {
   const queue = useQueue(guildId);
   sendQueue(guildId);
   const effects = effectState(queue);
-  const channel = client.guilds.cache.get(guildId)?.channels.cache.get(queue?.node.session?.channelId ?? '');
+  const channel = client.guilds.cache.get(guildId)?.members.me?.voice.channel;
+  const position = syncPosition(guildId);
   io.to(guildId).emit('statistics', {
+    guildId,
+    voiceChannel: channel ? { id: channel.id, name: channel.name } : null,
     effects: effects.filters,
     effectPresets,
     equalizerPreset: effects.equalizerPreset,
     equalizer: effects.equalizer.map((gain, band) => ({ band, gain })),
-    timestamp: queue?.node.getTimestamp(true) ?? null,
+    timestamp: queue?.node.getTimestamp() ?? null,
     sentAt: Date.now(),
     connected: Boolean(queue?.node.session),
+    playing: position.playing,
     listeners: channel?.isVoiceBased() ? channel.members.filter((m) => !m.user.bot).size : 0,
     tracks: queue?.tracks.size ?? 0,
-    volume: queue?.node.volume ?? 50,
+    volume: formatVolume(queue?.node.volume ?? 50),
     paused: queue?.node.isPaused() ?? false,
     repeatMode: queue?.repeatMode ?? 0,
     track: queue?.currentTrack ? publicTrack(queue.currentTrack) : null,
     shuffle: queue?.isShuffling ?? false,
   });
+}
+
+/** One small authoritative correction per guild; no queue serialization or database work. */
+export function syncPosition(guildId: string) {
+  const position = playbackPosition(useQueue(guildId));
+  io.to(guildId).emit('position', position);
+  return position;
 }

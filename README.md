@@ -47,6 +47,8 @@ Join a voice channel and run `/play query:Daft Punk One More Time`, or paste a Y
 
 Use `/join` to connect and prepare an empty queue before opening `/web`. You can then add songs from the dashboard, reorder or remove upcoming tracks, scrub the timeline, combine audio effects and follow synced lyrics. See [dashboard controls](docs/dashboard.md).
 
+Use `/lyrics` for the playing track's lyrics in Discord, or `/lyrics query:<song title and artist>` to search.
+
 Use `/pause`, `/resume`, `/skip`, `/back`, `/seek`, `/shuffle`, `/volume`, `/loop`, `/stop` and `/leave`. `/playlist create` saves the current and upcoming tracks; `/playlist list` shows your IDs. Play one with `/play query:playlist:<id>`.
 
 Run `/web` while in the bot's voice channel. Open the private link within **60 seconds**. The dashboard exchanges it once for an HTTP-only, one-hour cookie, then removes the code from the address bar. Do not share the link. Reloading uses the cookie; an expired session requires a new `/web` link. Every action rechecks your Discord membership and voice access.

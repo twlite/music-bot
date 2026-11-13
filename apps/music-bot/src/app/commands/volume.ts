@@ -1,3 +1,4 @@
+import { formatVolume } from '@/utils/format-volume';
 import type { ChatInputCommandContext } from './_types.js';
 import { EmbedGenerator } from '@/utils/embed-generator.js';
 import type { CommandData } from 'commandkit';
@@ -50,7 +51,7 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
 
   const embed = EmbedGenerator.Success({
     title: 'Volume',
-    description: `The current volume is \`${timeline.volume}%\`.`,
+    description: `The current volume is \`${formatVolume(timeline.volume)}%\`.`,
   }).withAuthor(interaction.user);
 
   return interaction.editReply({ embeds: [embed] });

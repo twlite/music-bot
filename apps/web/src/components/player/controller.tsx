@@ -134,8 +134,8 @@ export function PlayerController({ showArt: _showArt = false }) {
               <TabsContent value="queue" forceMount hidden={tab !== 'queue'}>
                 <QueueList />
               </TabsContent>
-              <TabsContent value="lyrics">
-                {tab === 'lyrics' && <Lyrics track={track} position={position} />}
+              <TabsContent value="lyrics" forceMount hidden={tab !== 'lyrics'}>
+                <Lyrics track={track} position={position} active={tab === 'lyrics'} />
               </TabsContent>
               <TabsContent value="effects">{tab === 'effects' && <Equalizer state={state} />}</TabsContent>
             </Tabs>

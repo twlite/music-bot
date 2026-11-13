@@ -1,3 +1,4 @@
+import { formatVolume } from '@/utils/format-volume';
 import { useQueue } from '@/player/runtime';
 import { SocketUser } from '../socket.js';
 import type { Socket } from 'socket.io';
@@ -15,7 +16,7 @@ export async function VolumeAction(info: SocketUser, socket: Socket, volume: num
       embeds: [
         EmbedGenerator.Success({
           title: 'Volume updated!',
-          description: `The volume was set to ${queue.node.volume}% by ${info.displayName} (<@${info.id}>).`,
+          description: `The volume was set to ${formatVolume(queue.node.volume)}% by ${info.displayName} (<@${info.id}>).`,
         }),
       ],
     });

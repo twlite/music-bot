@@ -1,5 +1,5 @@
 import type { QueueEventHandler } from '@/types/events';
-import { publicTrack } from '@/player/public-media';
+import { publicTrack, requesterFooter } from '@/player/public-media';
 import { EmbedGenerator } from '@/utils/embed-generator';
 
 import { io } from '@/web/index';
@@ -11,10 +11,7 @@ const handler: QueueEventHandler<'playerStart'> = async (queue, track) => {
     description: `[${track.title}](${track.url})`,
     title: 'Now Playing',
     thumbnail: { url: track.thumbnail },
-    footer: {
-      text: `Requested by ${String(track.requestedBy ?? 'unknown')}`,
-      iconURL: undefined,
-    },
+    footer: requesterFooter(track),
   });
 
   if (queue.metadata.channel.isSendable()) await queue.metadata.channel.send({ embeds: [embed] });

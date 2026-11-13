@@ -137,7 +137,7 @@ it('coalesces lyrics requests across clients and cancels pending work when the g
   const queue = { currentTrack: new Track({ title: 'Song' }), player: { lyrics: { search } } } as unknown as GuildQueue;
   const first = getLyrics(queue);
   const second = getLyrics(queue);
-  expect(first).toBe(second);
+  // Independent callers share a single provider request, not necessarily the same Promise wrapper.
   expect(search).toHaveBeenCalledTimes(1);
   releaseLyrics(queue);
   expect(controller.signal.aborted).toBe(true);
@@ -180,4 +180,82 @@ it('uses the official LRCLIB plugin through the native lyrics API', async () => 
   } finally {
     vi.unstubAllGlobals();
   }
+});
+
+it('keeps manual and automatic lyric lookups separate and reuses results when choosing a match', async () => {
+  const search = vi.fn().mockResolvedValue([
+    {
+      plain: { available: false },
+      synced: { available: true, lines: [{ timestampMs: 1000, line: 'First' }] },
+      metadata: { trackName: 'First match', artistName: 'First artist' },
+    },
+    {
+      plain: { available: true, text: 'Second text' },
+      synced: { available: false },
+      metadata: { trackName: 'Second match', artistName: 'Second artist' },
+    },
+  ]);
+  const track = new Track({ title: 'Automatic title' });
+  const queue = { currentTrack: track, player: { lyrics: { search } } } as unknown as GuildQueue;
+  expect((await getLyrics(queue)).lines[0].line).toBe('First');
+  const manual = await getLyrics(queue, 'correct song artist');
+  expect(manual.choices?.map((choice) => choice.title)).toEqual(['First match', 'Second match']);
+  const selected = await getLyrics(queue, 'correct song artist', 1);
+  expect(selected.plain).toBe('Second text');
+  expect(selected.resultIndex).toBe(1);
+  expect(search).toHaveBeenCalledTimes(2);
+  expect(search.mock.calls[0][0]).toBe(track);
+  expect(search.mock.calls[1][0]).toBe('correct song artist');
+  releaseLyrics(queue);
+});
+
+it('distinguishes same-title lyric versions using album, record ID and actual line timing', async () => {
+  const search = vi.fn().mockResolvedValue([
+    {
+      plain: { available: false },
+      synced: {
+        available: true,
+        lines: [
+          { timestampMs: 0, line: '' },
+          { timestampMs: 1500, line: 'First line' },
+          { timestampMs: 5500, line: 'Last line' },
+        ],
+      },
+      metadata: { id: 123, trackName: 'Song', artistName: 'Artist', albumName: 'Original album' },
+    },
+    {
+      plain: { available: false },
+      synced: {
+        available: true,
+        lines: [
+          { timestampMs: 2300, line: 'First line' },
+          { timestampMs: 6300, line: 'Last line' },
+        ],
+      },
+      metadata: { id: 456, trackName: 'Song', artistName: 'Artist', albumName: 'Deluxe album' },
+    },
+  ]);
+  const queue = { currentTrack: new Track({ title: 'Song' }), player: { lyrics: { search } } } as unknown as GuildQueue;
+  const result = await getLyrics(queue);
+  expect(result.choices).toMatchObject([
+    {
+      index: 0,
+      title: 'Song',
+      album: 'Original album',
+      recordId: '123',
+      lineCount: 2,
+      firstLineMs: 1500,
+      lastLineMs: 5500,
+    },
+    {
+      index: 1,
+      title: 'Song',
+      album: 'Deluxe album',
+      recordId: '456',
+      lineCount: 2,
+      firstLineMs: 2300,
+      lastLineMs: 6300,
+    },
+  ]);
+  releaseLyrics(queue);
 });

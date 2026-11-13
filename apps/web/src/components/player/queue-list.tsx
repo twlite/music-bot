@@ -1,8 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import type { SerializedTrack } from '@music-bot/shared';
 import { useSocket, useSocketEvent } from '@/context/socket.context';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchBox } from '@/components/nav/search-box';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from '@/components/ui/context-menu';
@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { DotsHorizontalIcon, DragHandleDots2Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { DotsHorizontalIcon, DragHandleDots2Icon, TrashIcon } from '@radix-ui/react-icons';
 import { AlbumCover } from './album-cover';
 import { cn } from '@/lib/utils';
 
@@ -32,19 +32,10 @@ export function RequestedBy({ track }: { track: SerializedTrack }) {
 
 export function QueueList() {
   const [tracks, setTracks] = useState<SerializedTrack[]>([]);
-  const [query, setQuery] = useState('');
   const [dragging, setDragging] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const { send } = useSocket();
   useSocketEvent('queue', setTracks);
-
-  function add(event: FormEvent) {
-    event.preventDefault();
-    if (query.trim()) {
-      send('play', query.trim());
-      setQuery('');
-    }
-  }
 
   const move = (trackId: string, beforeId: string | null) => send('queueMove', { trackId, beforeId });
   const drop = (beforeId: string | null) => {
@@ -62,19 +53,12 @@ export function QueueList() {
         </div>
         <Badge variant="secondary">{tracks.length} tracks</Badge>
       </div>
-      <form className="flex gap-2" onSubmit={add}>
-        <Input
-          aria-label="Track URL or search query"
-          placeholder="Paste a link or search for a song…"
-          value={query}
-          maxLength={1000}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <Button type="submit" disabled={!query.trim()}>
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Add
-        </Button>
-      </form>
+      <SearchBox
+        className="w-full"
+        showAddButton
+        label="Track URL or search query"
+        placeholder="Paste a link or search for a song…"
+      />
       <ScrollArea className="h-[440px] pr-3">
         {!tracks.length && (
           <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-dashed px-6 text-center">

@@ -41,6 +41,8 @@ export const QueueRepeatMode = {
   AUTOPLAY: 3,
 } as const;
 export interface IStatistics {
+  guildId: string;
+  voiceChannel: { id: string; name: string } | null;
   timestamp: {
     current: { label: string; value: number };
     total: { label: string; value: number };
@@ -48,6 +50,7 @@ export interface IStatistics {
   } | null;
   sentAt: number;
   connected: boolean;
+  playing: boolean;
   listeners: number;
   tracks: number;
   volume: number;
@@ -66,6 +69,7 @@ export type QueueData = {
 };
 export interface SocketEvents {
   statistics: [IStatistics];
+  position: [PlaybackPosition];
   loop: [QueueRepeatMode];
   queued: [QueueData];
   play: [QueueData];
@@ -95,12 +99,37 @@ export interface SocketActions {
   queueRemove: [{ trackId: string }];
   queueMove: [{ trackId: string; beforeId: string | null }];
   queueNext: [{ trackId: string }];
-  lyrics: [{ trackId: string }];
+  lyrics: [{ trackId: string; query?: string; resultIndex?: number; requestId?: string }];
 }
+
+export type PlaybackPosition = {
+  trackId: string | null;
+  positionMs: number;
+  durationMs: number;
+  playing: boolean;
+  paused: boolean;
+  sentAt: number;
+};
 
 export type DashboardLyrics = {
   trackId: string;
+  requestId?: string;
+  query?: string;
+  resultIndex?: number;
+  choices?: LyricsChoice[];
   status: 'ready' | 'unavailable' | 'error';
   lines: { timestampMs: number; line: string }[];
   plain: string | null;
+};
+
+export type LyricsChoice = {
+  index: number;
+  title: string;
+  artist: string;
+  synced: boolean;
+  album: string | null;
+  recordId: string | null;
+  lineCount: number;
+  firstLineMs: number | null;
+  lastLineMs: number | null;
 };

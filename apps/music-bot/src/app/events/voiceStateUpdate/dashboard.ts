@@ -1,5 +1,6 @@
+import { syncStatistics } from '@/web/statistics';
 import type { EventHandler } from 'commandkit';
-import { io } from '@/web/index';
+import { io } from '@/web/io';
 import { socketInfo } from '@/web/socket';
 
 const handler: EventHandler<'voiceStateUpdate'> = (_old, state) => {
@@ -10,6 +11,7 @@ const handler: EventHandler<'voiceStateUpdate'> = (_old, state) => {
     const memberChannel = state.guild.members.cache.get(user.id)?.voice.channelId;
     if (!memberChannel || (botChannel && memberChannel !== botChannel)) io.in(socketId).disconnectSockets(true);
   }
+  if (socketInfo.some((user) => user.guildId === state.guild.id)) syncStatistics({ guildId: state.guild.id });
 };
 
 export default handler;
