@@ -6,7 +6,7 @@ Features include search and autocomplete, saved private or public playlists, pre
 
 ![Dashboard](assets/image.png)
 
-The screenshot shows the earlier layout. The current dashboard adds queue management, synced lyrics and a Sound tab; see [dashboard controls](docs/dashboard.md).
+The screenshot shows the dashboard with music controls and live synchronized lyrics. The dashboard also offers queue management, sound tab, and synced lyrics. See [dashboard controls](docs/dashboard.md).
 
 **Migration status:** this branch uses a development release of Discord Player. Local builds, tests and native playback checks are described in [validation](docs/validation.md). Live Discord/provider playback and the complete Compose stack have not been certified. The remote profile builds the official Remedia Dockerfile at a pinned source revision, using published 0.2.1 binaries. Embedded Docker provisions FFmpeg independently. Neither path compiles Remedia or FFmpeg.
 
