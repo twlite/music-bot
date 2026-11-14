@@ -194,8 +194,8 @@ importers:
   apps/music-bot:
     dependencies:
       '@discord-player/plugin-host':
-        specifier: 8.0.0-dev.6
-        version: 8.0.0-dev.6(@remedia/node@0.2.1)
+        specifier: 8.0.0-dev.7
+        version: 8.0.0-dev.7(@remedia/node@0.2.1)
       '@music-bot/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -218,8 +218,8 @@ importers:
         specifier: ^2.8.6
         version: 2.8.6
       discord-player:
-        specifier: 8.0.0-dev.6
-        version: 8.0.0-dev.6(@remedia/node@0.2.1)
+        specifier: 8.0.0-dev.7
+        version: 8.0.0-dev.7(@remedia/node@0.2.1)
       discord.js:
         specifier: 14.28.1
         version: 14.28.1
@@ -264,11 +264,11 @@ importers:
   apps/stream-providers:
     dependencies:
       '@discord-player/plugin-host':
-        specifier: 8.0.0-dev.6
-        version: 8.0.0-dev.6(@remedia/node@0.2.1)
+        specifier: 8.0.0-dev.7
+        version: 8.0.0-dev.7(@remedia/node@0.2.1)
       discord-player:
-        specifier: 8.0.0-dev.6
-        version: 8.0.0-dev.6(@remedia/node@0.2.1)
+        specifier: 8.0.0-dev.7
+        version: 8.0.0-dev.7(@remedia/node@0.2.1)
       discord-player-applemusic:
         specifier: 1.0.3
         version: 1.0.3
@@ -618,8 +618,8 @@ packages:
     resolution: {integrity: sha512-OoKoR0f76dCY666JlcbhmVTs2drYj1GUXZTYTcbUgJjh9Nv41aFfZ21bPQTERm5+L5cBDo466NltB2lplS5GBw==}
     engines: {node: '>=20.19.0'}
 
-  '@discord-player/plugin-host@8.0.0-dev.6':
-    resolution: {integrity: sha512-nCsBxV2im8BW1qAt4wewwNnv6WpfRQLfzjfEU3vbedfMEWUCt48NRB6wfeownHWksuPc3+zQUNe07ZmUcoc6kQ==}
+  '@discord-player/plugin-host@8.0.0-dev.7':
+    resolution: {integrity: sha512-34YeUV0ATf1pSyd957BT30sRkEVdonONuBGAbUtik57Q/ORqxDgEO7j7+y8FEIhszTNhWjX3tZ4ocEoWX1Qf4A==}
 
   '@discordjs/builders@1.15.0':
     resolution: {integrity: sha512-AifaDWTw6WUDhKBn8E6mwwoyjDAcfsYq+ZE0nKSu1dMH1NLR22D3hGkNx+ctEv8NqHEHdAZnP5REteHDmn1lkA==}
@@ -1664,6 +1664,15 @@ packages:
       '@remedia/node':
         optional: true
 
+  '@remedia/client@0.2.2':
+    resolution: {integrity: sha512-UtNcR8EuN639uZ26fkaTa61qwBn+yU3aKnK/JVfXBgKXbcltNySDIDlind5ApnbLS8vDd8GX7d1iqt28G5sevA==}
+    engines: {node: '>=22.18.0'}
+    peerDependencies:
+      '@remedia/node': 0.2.2
+    peerDependenciesMeta:
+      '@remedia/node':
+        optional: true
+
   '@remedia/node-android-arm-eabi@0.2.1':
     resolution: {integrity: sha512-529fGoG4iiyNuLOfcqCDjELkC48z7RRewrrRGrJOUVBM4ZF0wkNZcp56ywVNmn+D9xbIGMuACkAAoiQuX2ORMw==}
     engines: {node: '>=22.18.0'}
@@ -1750,8 +1759,8 @@ packages:
     resolution: {integrity: sha512-wrBCZ2cPOEkb4K2k3wlwcvoxdsadqd107bH8YHJ6SJbrxQn2VD2QltqrIABjlZ1suW7mxjx/LLJtHMNModSmMQ==}
     engines: {node: '>=22.18.0'}
 
-  '@remedia/plugin-host@0.2.1':
-    resolution: {integrity: sha512-fEDDtNwkBHBIOm1Jlg9LE1vw9fsI5Z1P1PPFcfwg7tCmDWyeyd8Z0fmgXidIWPq9iubx1yqm+tnVezse7a+h5Q==}
+  '@remedia/plugin-host@0.2.2':
+    resolution: {integrity: sha512-ElvMCbxAyiG3JPjKk2POnB+yZV/itxAc94q6tRi3afq1KFmO23Nfjus8+hHVZC/FqP5yQigEtA5FX5j5G2Abmg==}
     engines: {node: '>=22.18.0'}
 
   '@rolldown/binding-android-arm-eabi@1.2.19':
@@ -2603,8 +2612,8 @@ packages:
       bgutils-js: ^4.0.0
       googlevideo: ^4.0.0
 
-  discord-player@8.0.0-dev.6:
-    resolution: {integrity: sha512-/t1NM97Ta29MUqHDe5LSATRzt0FeZwHmaR4vur5bBb9vqzUfTojaCmFtL5JeJmDV5gPfhFgBhdb7mfTFWXcciQ==}
+  discord-player@8.0.0-dev.7:
+    resolution: {integrity: sha512-AdjEA1YTTNvW6rkw1EQlO7NAJH5Iazw361rpKexx0kI0hpJ+I2gzm11zUpnTMUEUeVd10hDBxQqZx/h0JN8PbA==}
 
   discord.js@14.28.1:
     resolution: {integrity: sha512-Je5OcqgurnIUQK4vR+gQnmzOf/lNQsD6d/UkV8ZOj+bFa5zJXPyiGXlbywp2EagwshVT18y7YNQNSRd3FjYkDw==}
@@ -4475,11 +4484,11 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@discord-player/plugin-host@8.0.0-dev.6(@remedia/node@0.2.1)':
+  '@discord-player/plugin-host@8.0.0-dev.7(@remedia/node@0.2.1)':
     dependencies:
       '@discordjs/collection': 2.1.1
-      '@remedia/client': 0.2.1(@remedia/node@0.2.1)
-      '@remedia/plugin-host': 0.2.1
+      '@remedia/client': 0.2.2(@remedia/node@0.2.1)
+      '@remedia/plugin-host': 0.2.2
       zod: 4.6.7
     transitivePeerDependencies:
       - '@remedia/node'
@@ -5395,6 +5404,15 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  '@remedia/client@0.2.2(@remedia/node@0.2.1)':
+    dependencies:
+      ws: 8.22.2
+    optionalDependencies:
+      '@remedia/node': 0.2.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@remedia/node-android-arm-eabi@0.2.1':
     optional: true
 
@@ -5450,7 +5468,7 @@ snapshots:
       '@remedia/node-win32-ia32-msvc': 0.2.1
       '@remedia/node-win32-x64-msvc': 0.2.1
 
-  '@remedia/plugin-host@0.2.1': {}
+  '@remedia/plugin-host@0.2.2': {}
 
   '@rolldown/binding-android-arm-eabi@1.2.19':
     optional: true
@@ -6213,11 +6231,11 @@ snapshots:
       - '@noble/hashes'
       - canvas
 
-  discord-player@8.0.0-dev.6(@remedia/node@0.2.1):
+  discord-player@8.0.0-dev.7(@remedia/node@0.2.1):
     dependencies:
-      '@discord-player/plugin-host': 8.0.0-dev.6(@remedia/node@0.2.1)
+      '@discord-player/plugin-host': 8.0.0-dev.7(@remedia/node@0.2.1)
       '@discordjs/collection': 2.1.1
-      '@remedia/client': 0.2.1(@remedia/node@0.2.1)
+      '@remedia/client': 0.2.2(@remedia/node@0.2.1)
       zod: 4.6.7
     transitivePeerDependencies:
       - '@remedia/node'

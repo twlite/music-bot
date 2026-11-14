@@ -2,7 +2,7 @@ packages:
   - 'apps/*'
   - 'packages/*'
 minimumReleaseAgeExclude:
-  - '@remedia/client@0.2.1'
+  - '@remedia/client@0.2.1 || 0.2.2'
   - '@remedia/node-android-arm-eabi@0.2.1'
   - '@remedia/node-android-arm64@0.2.1'
   - '@remedia/node-darwin-arm64@0.2.1'
@@ -17,9 +17,9 @@ minimumReleaseAgeExclude:
   - '@remedia/node-win32-ia32-msvc@0.2.1'
   - '@remedia/node-win32-x64-msvc@0.2.1'
   - '@remedia/node@0.2.1'
-  - '@discord-player/plugin-host@8.0.0-dev.5 || 8.0.0-dev.6'
-  - '@remedia/plugin-host@0.2.1'
-  - discord-player@8.0.0-dev.5 || 8.0.0-dev.6
+  - '@discord-player/plugin-host@8.0.0-dev.5 || 8.0.0-dev.6 || 8.0.0-dev.7'
+  - '@remedia/plugin-host@0.2.1 || 0.2.2'
+  - discord-player@8.0.0-dev.5 || 8.0.0-dev.6 || 8.0.0-dev.7
 patchedDependencies:
   commandkit-plugin-discord-player@1.0.0: patches/commandkit-plugin-discord-player@1.0.0.patch
   commandkit@1.2.6: patches/commandkit@1.2.6.patch
