@@ -51,7 +51,7 @@ Use `/lyrics` for the playing track's lyrics in Discord, or `/lyrics query:<song
 
 Use `/pause`, `/resume`, `/skip`, `/back`, `/seek`, `/shuffle`, `/volume`, `/loop`, `/stop` and `/leave`. `/playlist create` saves the current and upcoming tracks; `/playlist list` shows your IDs. Play one with `/play query:playlist:<id>`.
 
-Run `/web` while in the bot's voice channel. Open the private link within **60 seconds**. The dashboard exchanges it once for an HTTP-only, one-hour cookie, then removes the code from the address bar. Do not share the link. Reloading uses the cookie; an expired session requires a new `/web` link. Every action rechecks your Discord membership and voice access.
+Run `/web` while in the bot's voice channel. Open the private link within **60 seconds**. The dashboard exchanges it once for HTTP-only access and refresh cookies, then removes the code from the address bar. Do not share the link. The 15-minute access cookie refreshes automatically while you use the dashboard; the refresh session expires after 30 days of inactivity or if Redis is cleared. Every action rechecks your Discord membership and voice access.
 
 ## Remote playback
 

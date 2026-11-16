@@ -1,4 +1,10 @@
-import { AudioFilter as AudioFilters, AudioFilterPresets, type AudioFilterName, type GuildQueue } from 'discord-player';
+import {
+  AudioFilter as AudioFilters,
+  AudioFilterPresets,
+  type AudioFilterName,
+  type GuildQueue,
+  GuildQueueOptions,
+} from 'discord-player';
 import { EqualizerConfigurationPreset, type EqualizerBand } from '@music-bot/shared';
 import { useDatabase } from '@/hooks/useDatabase';
 import type { IGuildSchema } from '@/bootstrap/mongo/Guild.schema';
@@ -71,7 +77,11 @@ export const effectPresets = [
     )[name] ?? name[0].toUpperCase() + name.slice(1),
 }));
 
-export type EffectState = { equalizer: number[]; equalizerPreset: string; filters: string[] };
+export type EffectState = {
+  equalizer: number[];
+  equalizerPreset: string;
+  filters: string[];
+};
 const states = new WeakMap<GuildQueue, EffectState>();
 
 export function matchingPreset(gains: number[]) {
@@ -99,7 +109,13 @@ export function rememberEffects(
 }
 
 export function effectState(queue?: GuildQueue | null): EffectState {
-  return (queue && states.get(queue)) || { equalizer: Array(15).fill(0), equalizerPreset: 'Flat', filters: [] };
+  return (
+    (queue && states.get(queue)) || {
+      equalizer: Array(15).fill(0),
+      equalizerPreset: 'Flat',
+      filters: [],
+    }
+  );
 }
 
 export function filterGraph(equalizer: number[], effects: string[]): string | null {
@@ -115,7 +131,7 @@ export function filterGraph(equalizer: number[], effects: string[]): string | nu
   );
 }
 
-export function queueDefaults(settings: IGuildSchema) {
+export function queueDefaults(settings: IGuildSchema): Partial<GuildQueueOptions> {
   return {
     volume: settings.volume,
     repeatMode: settings.loopMode,
@@ -147,7 +163,13 @@ async function apply(queue: GuildQueue, gains: number[], filters: string[]) {
   }
   await useDatabase().guild.updateOne(
     { id: queue.guildId },
-    { $set: { equalizer: gains, equalizerPreset: state.equalizerPreset, filters } },
+    {
+      $set: {
+        equalizer: gains,
+        equalizerPreset: state.equalizerPreset,
+        filters,
+      },
+    },
     { upsert: true, runValidators: true },
   );
 }

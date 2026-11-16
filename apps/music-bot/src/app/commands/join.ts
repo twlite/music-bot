@@ -32,7 +32,11 @@ export const chatInput = async ({ interaction }: ChatInputCommandContext) => {
       ...queueDefaults(settings),
     }));
   try {
-    await queue.connect({ channelId: channel.id, selfDeaf: true });
+    await queue.connect({
+      channelId: channel.id,
+      selfDeaf: true,
+      enableFallbackSeeking: true,
+    });
     rememberEffects(queue, settings);
     syncStatistics(queue);
     await interaction.editReply(`Joined <#${channel.id}>. The queue is ready.`);

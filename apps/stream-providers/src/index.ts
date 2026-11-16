@@ -39,9 +39,10 @@ const server = Bun.serve({
   hostname: config.hostname,
   port: config.port,
   idleTimeout: 60,
-
+  development: false,
   fetch(request, server) {
     const pathname = new URL(request.url).pathname;
+    console.log(`[>>] ${request.method} ${pathname}`);
 
     if (pathname === '/health') {
       return Response.json({ status: 'ok' });

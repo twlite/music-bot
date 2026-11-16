@@ -1,6 +1,6 @@
 import { config } from '@/config';
 import { publicTrack, publicPlaylist } from '@/player/public-media';
-import { exchangeSession } from '@/player/session';
+import { cookieToken, exchangeSessionTokens, refreshCookieToken, refreshSession } from '@/player/session';
 import { createServer } from 'node:http';
 import { SocketUser, createSocketServer } from './socket.js';
 import express from 'express';
@@ -20,10 +20,28 @@ app.get('/health', (_req, res) => {
 });
 app.post('/auth/exchange', async (req, res) => {
   if (req.headers.origin !== config.http.dashboardUrl) return void res.sendStatus(403);
-  const token = await exchangeSession(req.body?.code ?? '');
-  if (!token) return void res.sendStatus(401);
+  const tokens = await exchangeSessionTokens(req.body?.code ?? '');
+  if (!tokens) return void res.sendStatus(401);
   const secure = config.http.dashboardUrl?.startsWith('https://') ? '; Secure' : '';
-  res.setHeader('Set-Cookie', `music_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=3600${secure}`);
+  res.setHeader('Set-Cookie', [
+    `music_session=${tokens.accessToken}; HttpOnly; SameSite=Strict; Path=/; Max-Age=900${secure}`,
+    `music_refresh=${tokens.refreshToken}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${secure}`,
+  ]);
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendStatus(204);
+});
+
+app.post('/auth/refresh', async (req, res) => {
+  if (req.headers.origin !== config.http.dashboardUrl) return void res.sendStatus(403);
+
+  const tokens = await refreshSession(refreshCookieToken(req.headers.cookie), cookieToken(req.headers.cookie));
+  if (!tokens) return void res.sendStatus(401);
+
+  const secure = config.http.dashboardUrl?.startsWith('https://') ? '; Secure' : '';
+  res.setHeader('Set-Cookie', [
+    `music_session=${tokens.accessToken}; HttpOnly; SameSite=Strict; Path=/; Max-Age=900${secure}`,
+    `music_refresh=${tokens.refreshToken}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000${secure}`,
+  ]);
   res.setHeader('Cache-Control', 'no-store');
   res.sendStatus(204);
 });

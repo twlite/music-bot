@@ -47,7 +47,7 @@ export function syncStatistics({ guildId }: { guildId: string }) {
       ? {
           current: { value, label: label(value) },
           total: timestamp.total,
-          progress: position.durationMs > 0 ? Math.min(100, Math.round(value / position.durationMs * 100)) : 0,
+          progress: position.durationMs > 0 ? Math.min(100, Math.round((value / position.durationMs) * 100)) : 0,
         }
       : null,
     sentAt: Date.now(),

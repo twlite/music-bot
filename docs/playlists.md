@@ -16,4 +16,4 @@ Before upgrading:
 
 To deliberately migrate an individual playlist, play it, verify its titles and recording choices, then use `/playlist create` with a new name. That writes a separate v8 playlist and preserves the original ID/document. Catalogue sources can select a different playable recording, so review those tracks before saving. Roll back by deleting only the new playlist and returning to the old ID.
 
-Public autocomplete now resolves through the source plugin instead of copying the entire playlist collection into Redis. Private playlists are not placed into a shared public cache. MongoDB indexes cover author listing and public visibility; Redis exchange codes expire after 60 seconds and sessions after one hour.
+Public autocomplete now resolves through the source plugin instead of copying the entire playlist collection into Redis. Private playlists are not placed into a shared public cache. MongoDB indexes cover author listing and public visibility; Redis exchange codes expire after 60 seconds, access tokens after 15 minutes, and refresh sessions after 30 days of inactivity.

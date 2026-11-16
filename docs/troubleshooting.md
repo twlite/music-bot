@@ -16,7 +16,7 @@ On Linux inspect `LD_LIBRARY_PATH` in the service environment. On Windows open a
 
 Open the dashboard on the hostname configured in `http.dashboardUrl` in `app.config.json`. `localhost` and `127.0.0.1` are different origins. The browser, not the bot, must be able to reach `NEXT_PUBLIC_BACKEND_URL`. In Docker those values must not be `http://bot:5000`.
 
-Run `/web` again and open the link within one minute. It works once. Join the bot's voice channel before opening it. Sessions expire after one hour and are not valid after Redis is cleared. Make sure the proxy forwards Socket.IO WebSocket upgrades and credentials, and that dashboard/API names belong to the same site. A fresh dashboard build is required after changing public URL variables.
+Run `/web` again and open the link within one minute. It works once. Join the bot's voice channel before opening it. Access cookies refresh automatically; refresh sessions expire after 30 days of inactivity and are not valid after Redis is cleared. Make sure the proxy forwards Socket.IO WebSocket upgrades and credentials, and that dashboard/API names belong to the same site. A fresh dashboard build is required after changing public URL variables.
 
 ## Remote authentication or connection failure
 

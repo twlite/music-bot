@@ -14,7 +14,13 @@ export function usePlayback() {
   const { socket } = useSocket();
   const currentPosition = () => {
     const c = clock.current;
-    return Math.max(0, Math.min(c.total || Infinity, c.value + (c.advancing && c.rate !== null ? (performance.now() - c.received) * c.rate : 0)));
+    return Math.max(
+      0,
+      Math.min(
+        c.total || Infinity,
+        c.value + (c.advancing && c.rate !== null ? (performance.now() - c.received) * c.rate : 0),
+      ),
+    );
   };
 
   const reconcile = (packet: PlaybackPosition) => {
